@@ -1,0 +1,19 @@
+#logo
+{
+    display: block;
+    margin-top: 2%;
+    margin-left: auto;
+    margin-right: auto
+}
+
+#title
+{
+    text-align: center;
+    font-family: Baloo Regular, Baloo;
+    color: #ee5f5b;
+}
+
+.center
+{
+    color: #ffffff;
+}

@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block css %}
+<link href="/static/css/index_style.css" rel="stylesheet">
+{% endblock %}
+
+{% block title %}
+    Welcome!
+{% endblock %}
+
+{% block main %}
+<img src="static/images/logo.png" alt="exploding head" class="rounded float-center" width=220 height=220 id='logo'>
+<h1 id="title">BrainBrawlers</h1>
+<p class="center">BrainBrawlers is a new  kind of trivia game where you can compete online with strangers or friends for the highest score.<br>
+Players start with 4 lives and lose one when they get a question wrong or the timer runs out.<br>
+Register today and start playing for free!</p>
+{% endblock %}

@@ -1,0 +1,22 @@
+@font-face {
+    font-family: 'Baloo Regular'; /*a name to be used later*/
+    src: url('../Baloo-Regular.woff') format('woff');
+}
+
+.nav-link
+{
+    color: #ee5f5b;
+    font-family: Baloo Regular, Baloo;
+
+}
+
+body
+{
+    background-color: #000000;
+}
+
+.center
+{
+    color: #ffffff;
+    text-align:center;
+}
