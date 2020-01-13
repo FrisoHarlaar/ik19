@@ -11,6 +11,9 @@ app = Flask(__name__)
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+# Configure CS50 Library to use SQLite database
+db = SQL("sqlite:///brainbrawlers.db")
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -19,6 +22,42 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+# The index page.
 @app.route("/")
 def index():
     return render_template("index.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+
+    # User reached route via POST
+    if request.method == "POST":
+
+        # Assign form input to local dict
+        form = {"username": request.form.get("username"), "password": request.form.get("password"), "confirmation": request.form.get("confirmation")}
+
+        # Ensure form was fully filled out
+        for form_item in form.items():
+            if form_item[1] == '':
+                message = "must provide " + form_item[0]
+                return render_template("apology.html", message=message, code=400)
+
+        # Ensure password and confirmation match
+        if not form["password"] == form["confirmation"]:
+            return render_template("apology.html", message="password and confirmation do not match", code=400)
+
+        # hash password and insert data into database (we hebben nog geen database)
+        hashed_password = generate_password_hash(form["password"])
+        available = db.execute("INSERT INTO users (username, hash) VALUES (:username, :password)",
+                            username=form["username"], password=hashed_password)
+
+        # Give error if username is not available
+        if not available:
+            return render_template("apology.html", message="username not available", code=400)
+
+        session["user_id"] = (db.execute("SELECT id FROM users WHERE username= :username", username=form["username"])[0]["id"])
+
+        return redirect("/")
+
+    else:
+        return render_template("register.html")
