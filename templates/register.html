@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form id="my_form" action="/register" method="post" onsubmit="user_check()">
+        <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            </br>
+            <input id="username" autocomplete="off" autofocus class="form-control" name="username" type="text">
+            <div id="alert-username" class="invalid-feedback" style="display:none;">
+                Username already taken!
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label"for="password">Password</label>
+            </br>
+            <input class="form-control" name="password" type="password">
+            <div id="alert-password" class="invalid-feedback" style="display:none;">
+                Your password must be 6-20 characters long and must not contain spaces or special characters.
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="confirmation">Password confirmation</label>
+            </br>
+            <input class="form-control" name="confirmation" type="password">
+        </div>
+        <button id="myButton" class="btn btn-primary" type="submit">Register</button>
+    </form>
+    <script>
+        document.getElementById("my_form").addEventListener("submit", function(event){
+            event.preventDefault();
+        });
+        function user_check() {
+            var my_form = document.querySelector("form");
+            var username = document.querySelector("input[name='username']");
+            var password = document.querySelector("input[name='password]");
+
+            $.get("/check_username?username=" + username.value, function(available) {
+                var availability = $.parseJSON(available);
+                if (availability == false) {
+                    document.getElementById("alert-username").style.display = "block";
+                    document.getElementById("username").className = "form-control is-invalid";
+                    my_form.reset();
+                }
+            });
+            $.get("/check_password?password=" + password.value, function(correct) {
+                var correctness = $.parseJSON(correct);
+                if (correctness == false) {
+                    document.getElementById("alert-password").style.display = "block";
+                    document.getElementById("username").className = "form-control is-invalid";
+                    my_form.reset();
+                }
+            });
+            my_form.submit();
+
+        }
+    </script>
+{% endblock %}
