@@ -5,30 +5,44 @@
 {% endblock %}
 
 {% block main %}
-    <form class="my_form" action="/register" method="post" onsubmit="user_check()">
+<h1 class="center title">Register</h1>
+
+    <form id="my_form" action="/register" method="post" onsubmit="user_check()">
         <div class="form-group">
-            <label class="form-label" for="username">Username</label>
-            </br>
-            <input id="username" autocomplete="off" autofocus class="form-control" name="username" type="text">
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="username">Username</label>
+                <div class="col-sm-10">
+                    <input id="username" autocomplete="off" autofocus class="form-control col-sm-10" name="username" type="text">
+                </div>
+            </div>
             <div id="alert-username" class="invalid-feedback" style="display:none;">
                 Username already taken!
             </div>
         </div>
+
         <div class="form-group">
-            <label class="form-label"for="password">Password</label>
-            </br>
-            <input class="form-control" name="password" type="password">
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label" for="password">Password</label>
+                <div class="col-sm-10">
+                    <input class="form-control" autocomplete="off" autofocus class="form-control col-sm-10" name="password" type="password">
+                </div>
+            </div>
             <div id="alert-password" class="invalid-feedback" style="display:none;">
                 Your password must be 6-20 characters long and must not contain spaces or special characters.
             </div>
         </div>
+
         <div class="form-group">
-            <label class="form-label" for="confirmation">Confirmation</label>
-            </br>
-            <input class="form-control" name="confirmation" type="password">
+            <div class="form-group row">
+                <label class="fcol-sm-2 col-form-label" for="confirmation">Password confirmation</label>
+                <div class="col-sm-10">
+                    <input class="form-control" name="confirmation" type="password">
+                </div>
+            </div>
         </div>
-        <button id="FormButton" class="btn btn-primary" type="submit">Register</button>
+        <button class="btn btn-lg" type="submit">Register</button>
     </form>
+
     <script>
         document.getElementById("my_form").addEventListener("submit", function(event){
         event.preventDefault();

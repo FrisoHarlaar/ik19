@@ -6,15 +6,9 @@
     margin-right: auto
 }
 
-#title
-{
-    text-align: center;
-    font-family: Baloo Regular, Baloo;
-    color: #ee5f5b;
-}
 
-.center
+.btn
 {
-    color: #ffffff;
+    margin-left: 2%;
+    margin-right: 2%;
 }
-

@@ -26,23 +26,40 @@ main
 .center
 {
     color: #ffffff;
-    text-align:center;
+    text-align: center;
 }
 
-.form-label
+.col-form-label
 {
     color: #ffffff;
-    margin-left: 0%;
-    margin-right: 80%;
     text-align: left;
+    font-family: Baloo Regular, Baloo;
 }
 
-.my_form
+.btn
 {
-    display: inline-block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 30%;
+    width: 150px;
+    font-family: Baloo Regular, Baloo;
+    text-align: center;
+    color: #ee5f5b;
+    background-color: #fecb4c;
+    margin-top: 2%;
 }
 
 
+.title
+{
+    text-align: center;
+    font-family: Baloo Regular, Baloo;
+    color: #ee5f5b;
+}
+
+#navlogo
+{
+    font-size: 150%;
+}
+
+input
+{
+    margin-bottom: 5%;
+}
