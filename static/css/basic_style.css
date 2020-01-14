@@ -18,10 +18,21 @@ body
 .center
 {
     color: #ffffff;
-    text-align:center;
+    text-align: center;
 }
 
 .form-label
 {
     color: #ffffff;
+}
+
+.btn
+{
+    width: 110px;
+    font-family: Baloo Regular, Baloo;
+    text-align: center;
+    color: #ee5f5b;
+    background-color: #fecb4c;
+    margin-top: 5%;
+    margin-left: 5%;
 }

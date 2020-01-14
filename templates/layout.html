@@ -19,7 +19,7 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-expand-md">
+        <nav class="navbar fixed-top navbar-expand-md">
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
@@ -38,7 +38,7 @@
             </div>
         </nav>
         <!-- This is were the other templates get inserted into the file -->
-        <main class="container p-5">
+        <main class="container p-5 center">
             {% block main %}{% endblock %}
         </main>
     </body>
