@@ -15,9 +15,34 @@ body
     background-color: #000000;
 }
 
+main
+{
+    /* scroll horizontally as needed */
+    overflow-x: auto;
+
+    text-align: center;
+}
+
 .center
 {
     color: #ffffff;
     text-align:center;
 }
+
+.form-label
+{
+    color: #ffffff;
+    margin-left: 0%;
+    margin-right: 80%;
+    text-align: left;
+}
+
+.my_form
+{
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%;
+}
+
 

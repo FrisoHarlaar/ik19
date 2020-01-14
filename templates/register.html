@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block main %}
-    <form id="my_form" action="/register" method="post" onsubmit="user_check()">
+    <form class="my_form" action="/register" method="post" onsubmit="user_check()">
         <div class="form-group">
             <label class="form-label" for="username">Username</label>
             </br>
@@ -23,22 +23,28 @@
             </div>
         </div>
         <div class="form-group">
-            <label class="form-label" for="confirmation">Password confirmation</label>
+            <label class="form-label" for="confirmation">Confirmation</label>
             </br>
             <input class="form-control" name="confirmation" type="password">
         </div>
-        <button id="myButton" class="btn btn-primary" type="submit">Register</button>
+        <button id="FormButton" class="btn btn-primary" type="submit">Register</button>
     </form>
     <script>
         document.getElementById("my_form").addEventListener("submit", function(event){
-            event.preventDefault();
+        event.preventDefault();
+        document.getElementById("alert-username").style.display = "none";
+        document.getElementById("username").className = "form-control";
+        document.getElementById("alert-password").style.display = "none";
+        document.getElementById("password").className = "form-control";
         });
-        function user_check() {
+
+        function check() {
             var my_form = document.querySelector("form");
             var username = document.querySelector("input[name='username']");
-            var password = document.querySelector("input[name='password]");
+            var password = document.querySelector("input[name='password']");
+            var confirm = document.querySelector("input[name='confirmation']");
 
-            $.get("/check_username?username=" + username.value, function(available) {
+            var user_check = $.get("/check?username=" + username.value, function(available) {
                 var availability = $.parseJSON(available);
                 if (availability == false) {
                     document.getElementById("alert-username").style.display = "block";
@@ -46,16 +52,26 @@
                     my_form.reset();
                 }
             });
-            $.get("/check_password?password=" + password.value, function(correct) {
-                var correctness = $.parseJSON(correct);
-                if (correctness == false) {
+            var pass_check = $.post("/check", {password: password.value, confirmation: confirm.value}, function(correctness) {
+                if (correctness.succes == false) {
                     document.getElementById("alert-password").style.display = "block";
-                    document.getElementById("username").className = "form-control is-invalid";
+                    document.getElementById("password").className = "form-control is-invalid";
+                    my_form.reset();
+                }
+
+                if (correctness.confirmation == false) {
+                    document.getElementById("alert-confirmation").style.display = "block";
+                    document.getElementById("confirmation").className = "form-control is-invalid";
                     my_form.reset();
                 }
             });
-            my_form.submit();
-
+            user_check.done(function(availability) {
+                pass_check.done(function(correctness) {
+                    if (availability == true && correctness.succes == true && correctness.confirmation == true) {
+                        my_form.submit();
+                    }
+                });
+            });
         }
     </script>
 {% endblock %}
