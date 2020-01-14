@@ -94,6 +94,7 @@ def register():
 
         return redirect("/")
 
+    # User reached route via GET
     else:
         return render_template("auth/register.html")
 
@@ -117,7 +118,6 @@ def check():
 
     # Reached via POST
     else:
-
         # Get password
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
