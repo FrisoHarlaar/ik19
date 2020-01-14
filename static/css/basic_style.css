@@ -24,18 +24,18 @@ body
 .col-form-label
 {
     color: #ffffff;
-    text-align: right;
+    text-align: left;
     font-family: Baloo Regular, Baloo;
 }
 
 .btn
 {
-    width: 110px;
+    width: 150px;
     font-family: Baloo Regular, Baloo;
     text-align: center;
     color: #ee5f5b;
     background-color: #fecb4c;
-    margin-top: 5%;
+    margin-top: 2%;
 }
 
 
@@ -49,4 +49,9 @@ body
 #navlogo
 {
     font-size: 150%;
+}
+
+input
+{
+    margin-bottom: 5%;
 }
