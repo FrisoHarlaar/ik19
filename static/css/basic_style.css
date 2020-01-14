@@ -21,9 +21,11 @@ body
     text-align: center;
 }
 
-.form-label
+.col-form-label
 {
     color: #ffffff;
+    text-align: right;
+    font-family: Baloo Regular, Baloo;
 }
 
 .btn
@@ -34,5 +36,17 @@ body
     color: #ee5f5b;
     background-color: #fecb4c;
     margin-top: 5%;
-    margin-left: 5%;
+}
+
+
+.title
+{
+    text-align: center;
+    font-family: Baloo Regular, Baloo;
+    color: #ee5f5b;
+}
+
+#navlogo
+{
+    font-size: 150%;
 }

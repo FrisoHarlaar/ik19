@@ -10,21 +10,17 @@
 
 {% block main %}
 <img src="static/images/logo.png" alt="exploding head" class="rounded float-center" width=220 height=220 id='logo'>
-<h1 class="center" id="title">BrainBrawlers</h1>
+<h1 class="center title">BrainBrawlers</h1>
 <p  class="center">BrainBrawlers is a new  kind of trivia game where you can compete online with strangers or friends for the highest score.<br>
 Players start with 4 lives and lose one when they get a question wrong or the timer runs out.<br>
 Register today and start playing for free!</p>
-<<<<<<< HEAD
-<div class="mx-auto" style="width: 255px;">
-    <a href="register.html">
+
+<div class="mx-auto">
+    <a href="/register">
         <button class="btn btn-lg">Register</button>
     </a>
-    <a href="register.html">
+    <a href="/login">
         <button class="btn btn-lg">Log in</button>
     </a>
 </div>
-
-</br>
-<form action="/register" method="get">
-    <button id="RegisterButton" class="btn btn-primary" type="submit">Register here!</button>
-</form>
+{% endblock %}
