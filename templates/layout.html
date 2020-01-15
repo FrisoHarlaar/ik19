@@ -23,7 +23,7 @@
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link">BrainBrawlers</a></li>
+                        <li class="nav-item nav-logo"><a class="nav-link" href="/">BrainBrawlers</a></li>
                         <li class="nav-item"><a class="nav-link" href="/leaderboard">Leaderboard</a></li>
                         <li class="nav-item"><a class="nav-link" href="/profile">Profile</a></li>
                     </ul>
@@ -32,7 +32,7 @@
                     </ul>
                 {% else %}
                     <ul class="navbar-nav mr-auto mt-2">
-                        <li class="nav-item"><a class="nav-link" id="navlogo" href="/">BrainBrawlers</a></li>
+                        <li class="nav-item nav-logo"><a class="nav-link" href="/">BrainBrawlers</a></li>
                         <li class="nav-item"><a class="nav-link" href="/leaderboard">Leaderboard</a></li>
                     </ul>
                 {% endif %}

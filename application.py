@@ -34,7 +34,12 @@ Session(app)
 @app.route("/")
 @login_required
 def dashboard():
-    return render_template("dashboard.html")
+    # Query database for userdata
+    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
+                    user_id=session["user_id"])
+    # Take the username and highscore
+    username, highscore = rows[0]["username"], rows[0]["highscore"]
+    return render_template("dashboard.html", username=username, highscore=highscore)
 
 @app.route("/index")
 def index():
@@ -44,7 +49,7 @@ def index():
 def login():
     """Log user in"""
     # Forget any user_id
-    # session.clear()
+    session.clear()
 
     # User reached route via GET (as by clicking a link or via redirect)
     if request.method == "GET":
@@ -96,8 +101,8 @@ def register():
 
         # hash password and insert data into database (we hebben nog geen database)
         hashed_password = generate_password_hash(form["password"])
-        available = db.execute("INSERT INTO users (username, hash) VALUES (:username, :password)",
-                            username=form["username"], password=hashed_password)
+        available = db.execute("INSERT INTO users (username, hash, highscore) VALUES (:username, :password, :hs)",
+                            username=form["username"], password=hashed_password, hs=0)
 
         # Give error if username is not available
         if not available:

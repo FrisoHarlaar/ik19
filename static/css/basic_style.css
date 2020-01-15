@@ -53,9 +53,10 @@ main
     font-family: Baloo Regular, Baloo;
     color: #ee5f5b;
     margin-bottom: 2%;
+    margin-top: 5%;
 }
 
-#navlogo
+.nav-logo
 {
     font-size: 150%;
 }

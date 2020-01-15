@@ -4,8 +4,23 @@
     Dashboard
 {% endblock %}
 
+{% block css %}
+<link href="/static/css/db_style.css" rel="stylesheet">
+{% endblock %}
+
 {% block main %}
-<p  class="center">BrainBrawlers is a new  kind of trivia game where you can compete online with strangers or friends for the highest score.<br>
-Players start with 4 lives and lose one when they get a question wrong or the timer runs out.<br>
-Register today and start playing for free!</p>
+<h1 class="center title">Dashboard</h1>
+
+<p id="dbtext">Welcome back {{ username }}!
+<br>
+Why don't you grab some coffee
+<br>
+and show em how it's done?</p>
+
+<img src="static/images/bicep.png" alt="flexing bicep" class="float-right" width=200 height=200 id="bicep">
+
+<form id="my_form" action="/dashboard" method="get">
+    <button class="btn btn-lg" type="submit">Play</button>
+    <p class="center">Personal best: {{ highscore }}</p>
+</form>
 {% endblock %}
