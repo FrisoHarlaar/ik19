@@ -1,4 +1,9 @@
 # ik19
+
+Samenvatting <br>
+Wij willen een spelletje creëren dat je kan spelen op een browser in de vorm van een trivia spel. Je moet kunnen inloggen zodat je <br>scores kan vergelijken met scores van andere spelers. De scores moeten opgeslagen worden in een database.  Elke speler begint <br>met vier levens die eraf gaan als je een vraag fout of niet binnen de tijd (30 seconden) beantwoordt. Elke vraag geeft één <br>punt, dus elk spel geeft minimaal 4 punten. Er zijn verschillende categorieën en moeilijkheidsgraden.
+
+
 Routes:
 
 register POST <br>
