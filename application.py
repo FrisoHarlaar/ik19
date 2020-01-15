@@ -4,6 +4,8 @@ from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
+from helpers import login_required
+from tempfile import mkdtemp
 
 # Configure application
 app = Flask(__name__)
@@ -22,8 +24,19 @@ def after_request(response):
     response.headers["Pragma"] = "no-cache"
     return response
 
+# Configure session to use filesystem (instead of signed cookies)
+app.config["SESSION_FILE_DIR"] = mkdtemp()
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
+
 # The index page.
 @app.route("/")
+@login_required
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/index")
 def index():
     return render_template("index.html")
 
@@ -37,30 +50,30 @@ def login():
     if request.method == "GET":
         return render_template("auth/login.html")
 
-    # # User reached route via POST (as by submitting a form via POST)
-    # else:
-    #     # Assign form input to local dict
-    #     form = {"username": request.form.get("username"), "password": request.form.get("password")}
+    # User reached route via POST (as by submitting a form via POST)
+    else:
+         # Assign form input to local dict
+        form = {"username": request.form.get("username"), "password": request.form.get("password")}
 
-    #     # Ensure form was fully filled out
-    #     for form_item in form.items():
-    #         if form_item[1] == '':
-    #             message = "must provide " + form_item[0]
-    #             return render_template("apology.html", message=message, code=400)
+         # Ensure form was fully filled out
+        for form_item in form.items():
+            if form_item[1] == '':
+                message = "must provide " + form_item[0]
+                return render_template("apology.html", message=message, code=400)
 
-    #     # Query database for username
-    #     rows = db.execute("SELECT * FROM users WHERE username = :username",
-    #                       username=request.form.get("username"))
+        # Query database for username
+        rows = db.execute("SELECT * FROM users WHERE username = :username",
+                         username=request.form.get("username"))
 
-    #     # Ensure username exists and password is correct
-    #     if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-    #         return render_template("apology.html", message="invalid username and/or password", code=400)
+        # Ensure username exists and password is correct
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+            return render_template("apology.html", message="invalid username and/or password", code=400)
 
-    #     # Remember which user has logged in
-    #     session["user_id"] = rows[0]["id"]
+        # Remember which user has logged in
+        session["user_id"] = rows[0]["id"]
 
-    #     # Redirect user to home page
-    #     return redirect("/")
+        # Redirect user to home page
+        return redirect("/")
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -150,8 +163,4 @@ def logout():
 
 @app.route("/triviagame", methods=["GET", "POST"])
 def triviagame():
-    return redirect("/")
-
-@app.route("/dashboard", methods=["GET", "POST"])
-def dashboard():
     return redirect("/")
