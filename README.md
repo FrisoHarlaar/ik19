@@ -20,6 +20,8 @@ profile POST <br>
 
 ![profile sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/profile.png)
 
+https://drive.google.com/open?id=1i1CcKv4qYAudbn1Wy_uRDpWVmmscqeqm
+
 Plugins:
 
 Bootstap, flask en opentdb (trivia-vragen database).
