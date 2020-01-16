@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Leaderboard
+{% endblock %}
+
+{% block main %}
+    <table class="table table-striped" style="width:100%">
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+    {% for highscore in highscores %}
+        <tr>
+            <td>{{ highscore.name }}</td>
+            <td>{{ highscore.date }}</td>
+            <td>{{ highscore.highscore }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

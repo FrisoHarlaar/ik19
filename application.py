@@ -166,6 +166,15 @@ def logout():
     # return to homescreen
     return redirect("/")
 
+
+@app.route("/leaderboard")
+@login_required
+def leaderboard():
+    "Show the leaderboard of the 50 best players"
+    highscores = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
+    return render_template("leaderboard.html", highscores=highscores)
+
+
 @app.route("/triviagame", methods=["GET", "POST"])
 def triviagame():
     if request.method == "GET":
