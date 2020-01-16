@@ -1,0 +1,15 @@
+.hearth
+{
+    margin-top: 5%;
+}
+
+#question
+{
+    width: 40%;
+    text-align: left;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -200px;
+}

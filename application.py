@@ -1,5 +1,5 @@
 import os
-
+import urllib.request, json
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
@@ -168,4 +168,10 @@ def logout():
 
 @app.route("/triviagame", methods=["GET", "POST"])
 def triviagame():
-    return redirect("/")
+    if request.method == "GET":
+        # Returns a dict within a list within a dict!!!
+        with urllib.request.urlopen("https://opentdb.com/api.php?amount=1&difficulty=easy") as url:
+            data = json.loads(url.read().decode())
+        question = data['results'][0]["question"]
+        lives=4
+        return render_template("game/main.html", lives=lives, question=question)
