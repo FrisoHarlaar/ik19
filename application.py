@@ -168,11 +168,10 @@ def logout():
 
 
 @app.route("/leaderboard")
-@login_required
 def leaderboard():
     "Show the leaderboard of the 50 best players"
-    highscores = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
-    return render_template("leaderboard.html", highscores=highscores)
+    highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    return render_template("game/leaderboard.html", highscores=highscores)
 
 
 @app.route("/triviagame", methods=["GET", "POST"])
