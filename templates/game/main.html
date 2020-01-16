@@ -9,8 +9,23 @@
 {% endblock %}
 
 {% block main %}
+
 {% for live in range(lives) %}
 <img src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
 {% endfor %}
+<p id="score">{{ score }}</p>
 <p id="question">{{ question | safe }}</p>
+
+<!-- Answers -->
+<form name="answer" method="post" action="/triviagame">
+    <div class="btn-group-vertical" style="text-align:left">
+        {% for answer in answers %}
+        <button type="submit" name="answer" value="{{ answer }}" class="btn answer">{{ answer | safe }}</button>
+        {% endfor %}
+    </div>
+</form>
+
 {% endblock %}
+
+
+

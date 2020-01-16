@@ -1,15 +1,33 @@
 .hearth
 {
     margin-top: 5%;
+
+}
+
+#score
+{
+    font-family: Baloo Regular, Baloo;
+    font-size: 350%;
+    margin-top: 3%;
+    margin-left: 5%;
+    text-align: right;
 }
 
 #question
 {
-    width: 40%;
+    width: 50%;
+    font-size: 150%;
+    position: static;
     text-align: left;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    margin-top: -100px;
-    margin-left: -200px;
+    margin-top: 10%;
+    margin-bottom: 5%;
+    margin-left: 30%;
+}
+
+.answer
+{
+    width: 150%;
+    background-color: black;
+    text-align: left;
+    margin-bottom: 10%;
 }

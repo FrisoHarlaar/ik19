@@ -1,5 +1,4 @@
-import os
-import urllib.request, json
+import os, random, urllib.request, json
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
@@ -158,6 +157,7 @@ def check():
 
 
 @app.route("/logout")
+@login_required
 def logout():
 
     # clear session
@@ -175,11 +175,32 @@ def leaderboard():
 
 
 @app.route("/triviagame", methods=["GET", "POST"])
+@login_required
 def triviagame():
+    # When the user first starts up the game.
     if request.method == "GET":
+        # Clears the session (except for the user ID) so the user can start a new game.
+        user_id = session["user_id"]
+        session.clear()
+        session["user_id"] = user_id
         # Returns a dict within a list within a dict!!!
         with urllib.request.urlopen("https://opentdb.com/api.php?amount=1") as url:
             data = json.loads(url.read().decode())
+        # Takes the question and answers from the data
         question = data['results'][0]["question"]
-        lives=4
-        return render_template("game/main.html", lives=lives, question=question)
+        incorrect_answers = data['results'][0]["incorrect_answers"]
+        correct_answer = data['results'][0]["correct_answer"]
+        session["correct_answer"] = correct_answer
+        # Makes one list with all possible answers
+        all_answers = incorrect_answers + [correct_answer]
+        lives= 4
+        score = 0
+        return render_template("game/main.html", lives=lives, question=question, answers=all_answers, score=score)
+
+    # After answering the first answer.
+    if request.method == "POST":
+        if request.form['answer'] == session["correct_answer"]:
+            user_answer=request.form['answer']
+            return redirect("/")
+        else:
+            return redirect("/leaderboard")
