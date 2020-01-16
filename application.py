@@ -170,7 +170,7 @@ def logout():
 def triviagame():
     if request.method == "GET":
         # Returns a dict within a list within a dict!!!
-        with urllib.request.urlopen("https://opentdb.com/api.php?amount=1&difficulty=easy") as url:
+        with urllib.request.urlopen("https://opentdb.com/api.php?amount=1") as url:
             data = json.loads(url.read().decode())
         question = data['results'][0]["question"]
         lives=4
