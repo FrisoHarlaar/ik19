@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Profile
+{% endblock %}
+
+{% block main %}
+    <table id=table style="width:100%">
+        <tr>
+            <th>Username</th>
+            <td>{{ username }}</td>
+            <th>Change username</th>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td>{{ password }}</td>
+            <th>Change password</th>
+        </tr>
+        <tr>
+            <th>Personal best</th>
+            <td>{{ highscore }}</td>
+        </tr>
+        <tr>
+            <th>Rank</th>
+            <td>{{ rank }}</td>
+        </tr>
+    </table>
+{% endblock %}
