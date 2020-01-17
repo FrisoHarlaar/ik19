@@ -33,6 +33,7 @@ Session(app)
 @app.route("/")
 @login_required
 def dashboard():
+    session["timer"] = False
     # Query database for userdata
     rows = db.execute("SELECT * FROM users WHERE id = :user_id",
                     user_id=session["user_id"])
@@ -178,7 +179,7 @@ def leaderboard():
 @login_required
 def triviagame():
     # When the user first starts up the game.
-    if request.method == "GET":
+    if request.method == "GET" and session["timer"] == False:
         # Clears the session (except for the user ID) so the user can start a new game.
         user_id = session["user_id"]
         session.clear()
@@ -195,6 +196,7 @@ def triviagame():
         random.shuffle(all_answers)
         session["lives"] = 4
         session["score"] = 0
+        session["timer"] = True
         return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
 
     # After answering the first answer.
@@ -205,6 +207,23 @@ def triviagame():
             # If the user is out of lives it's game over.
             if session["lives"] == 0:
                 return redirect("/")
+        session["score"] += 1
+        data = new_question()
+         # Takes the question and answers from the data
+        question = data["question"]
+        incorrect_answers = data["incorrect_answers"]
+        correct_answer = data["correct_answer"]
+        session["correct_answer"] = correct_answer
+        # Makes one list with all possible answers and shuffles it.
+        all_answers = incorrect_answers + [correct_answer]
+        random.shuffle(all_answers)
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+
+    else:
+        session["lives"] -= 1
+        # If the user is out of lives it's game over.
+        if session["lives"] == 0:
+            return redirect("/")
         session["score"] += 1
         data = new_question()
          # Takes the question and answers from the data
