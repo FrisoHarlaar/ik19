@@ -1,9 +1,9 @@
-import os, random, urllib.request, json
+import os, random, urllib.request
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import login_required
+from helpers import login_required, new_question
 from tempfile import mkdtemp
 
 # Configure application
@@ -184,23 +184,35 @@ def triviagame():
         session.clear()
         session["user_id"] = user_id
         # Returns a dict within a list within a dict!!!
-        with urllib.request.urlopen("https://opentdb.com/api.php?amount=1") as url:
-            data = json.loads(url.read().decode())
+        data = new_question()
         # Takes the question and answers from the data
-        question = data['results'][0]["question"]
-        incorrect_answers = data['results'][0]["incorrect_answers"]
-        correct_answer = data['results'][0]["correct_answer"]
+        question = data["question"]
+        incorrect_answers = data["incorrect_answers"]
+        correct_answer = data["correct_answer"]
         session["correct_answer"] = correct_answer
-        # Makes one list with all possible answers
+        # Makes one list with all possible answers and shuffles it.
         all_answers = incorrect_answers + [correct_answer]
-        lives= 4
-        score = 0
-        return render_template("game/main.html", lives=lives, question=question, answers=all_answers, score=score)
+        random.shuffle(all_answers)
+        session["lives"] = 4
+        session["score"] = 0
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
 
     # After answering the first answer.
     if request.method == "POST":
-        if request.form['answer'] == session["correct_answer"]:
+        if request.form['answer'] != session["correct_answer"]:
             user_answer=request.form['answer']
-            return redirect("/")
-        else:
-            return redirect("/leaderboard")
+            session["lives"] -= 1
+            # If the user is out of lives it's game over.
+            if session["lives"] == 0:
+                return redirect("/")
+        session["score"] += 1
+        data = new_question()
+         # Takes the question and answers from the data
+        question = data["question"]
+        incorrect_answers = data["incorrect_answers"]
+        correct_answer = data["correct_answer"]
+        session["correct_answer"] = correct_answer
+        # Makes one list with all possible answers and shuffles it.
+        all_answers = incorrect_answers + [correct_answer]
+        random.shuffle(all_answers)
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
