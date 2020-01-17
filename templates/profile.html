@@ -5,24 +5,21 @@
 {% endblock %}
 
 {% block main %}
-    <table id=table style="width:100%">
+    <table id=table style="width:75%">
+        <link href="/static/css/profile.css" rel="stylesheet">
         <tr>
             <th>Username</th>
             <td>{{ username }}</td>
-            <th>Change username</th>
+            <th style="text-decoration: underline;">Change username</th>
         </tr>
         <tr>
             <th>Password</th>
-            <td>{{ password }}</td>
-            <th>Change password</th>
+            <td>**********</td>
+            <th style="text-decoration: underline;">Change password</th>
         </tr>
         <tr>
             <th>Personal best</th>
-            <td>{{ highscore }}</td>
-        </tr>
-        <tr>
-            <th>Rank</th>
-            <td>{{ rank }}</td>
+            <td id=highscore colspan="2">{{ highscore }}!!!</td>
         </tr>
     </table>
 {% endblock %}

@@ -173,6 +173,17 @@ def leaderboard():
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
     return render_template("game/leaderboard.html", highscores=highscores)
 
+@app.route("/profile", methods=["GET"])
+@login_required
+def profile():
+    # Query database for user
+    profiles = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
+
+    # Select for user: username and highscore
+    for profile in profiles:
+        username = profile["username"]
+        highscore = profile["highscore"]
+    return render_template("profile.html", username=username, highscore=highscore)
 
 @app.route("/triviagame", methods=["GET", "POST"])
 @login_required
