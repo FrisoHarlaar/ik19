@@ -1,0 +1,41 @@
+#table {
+  margin:100px 50px 75px 100px;
+  font-family: Baloo Regular, Baloo;
+  background-color: #ffcc00;
+  border-radius: 12px;
+}
+
+th{
+  color:#ee5f5b;
+  height: 100px;
+  font-size: 120%;
+  letter-spacing: 1px;
+}
+
+td{
+  color:black;
+  height: 100px;
+  font-size: 100%;
+}
+
+#highscore{
+  text-align: center;
+  padding: 40px 0;
+  font-size: calc(6em + 5vw);
+  white-space: nowrap;
+  background: linear-gradient( 92deg, #95d7e3, #eb76ff );
+  background: -webkit-linear-gradient( 92deg, #95d7e3, #eb76ff );
+  background-size:600vw 600vw;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textAnimate 5s linear infinite alternate;
+}
+
+@keyframes textAnimate {
+  from {
+    filter: hue-rotate(0deg);
+  }
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
