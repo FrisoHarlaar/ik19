@@ -122,7 +122,7 @@ def check():
 
     # Route is reached via GET
     if request.method == "GET":
-        print(0)
+
         # Get username from register
         username = request.args.get("username")
 
@@ -146,15 +146,16 @@ def check():
 
         # Check length of password
         if len(password) >= 6 and len(password) < 20 and len(numbers) > 0 and password.find(" ") == -1:
+
             if password == confirmation:
-                print(1)
                 return jsonify(succes=True, confirmation=True)
-            else:
-                print(2, password, confirmation)
-                return jsonify(succes=True, confirmation=False)
-        else:
-            print(3)
-            return jsonify(succes=False)
+
+            return jsonify(succes=True, confirmation=False)
+
+        elif password == confirmation:
+            return jsonify(succes=False, confirmation=True)
+
+        return jsonify(succes=False, confirmation=False)
 
 
 @app.route("/logout")
@@ -185,6 +186,37 @@ def profile():
         username = profile["username"]
         highscore = profile["highscore"]
     return render_template("profile.html", username=username, highscore=highscore)
+
+@app.route("/change_password", methods=["GET", "POST"])
+@login_required
+def change_password():
+    """Change password user"""
+        # If user used "GET"
+    if request.method == "GET":
+        return render_template("change_password.html")
+
+    # User reached route via POST
+    else:
+
+        # Assign form input to local dict
+        form = {"username": request.form.get("username"), "password": request.form.get("password")}
+
+        # Ensure form was fully filled out
+        for form_item in form.items():
+            if form_item[1] == '':
+                message = "must provide " + form_item[0]
+                return render_template("apology.html", message=message, code=400)
+
+        # Ensure new password and confirmation match
+        if request.form.get("new password") != request.form.get("confirmation"):
+            return render_template("apology.html", message="new password and confirmation don't match", code=400)
+
+        # Set new password in database
+        hash = generate_password_hash(request.form.get("new password"))
+        db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=session["user_id"], hash=hash)
+
+        return render_template("change_password.html")
+
 
 @app.route("/triviagame", methods=["GET", "POST"])
 @login_required
