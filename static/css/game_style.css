@@ -31,3 +31,26 @@
     text-align: left;
     margin-bottom: 10%;
 }
+
+#progress
+{
+    height: 100px;
+    background-color: black;
+}
+
+.progress > svg
+{
+    position: absolute;
+    height: 30%;
+    bottom: 100px;
+    left: 100px;
+    display: block;
+}
+
+#alarm_clock
+{
+    position: absolute;
+    bottom: 185px;
+    left: 185px;
+    display: block;
+}

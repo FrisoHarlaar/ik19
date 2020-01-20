@@ -190,15 +190,17 @@ def profile():
 @login_required
 def change_password():
     """Change password user"""
-        # If user used "GET"
+    # User reached route via "GET"
     if request.method == "GET":
-        return render_template("change_password.html")
+        return render_template("auth/change_password.html")
 
     # User reached route via POST
     else:
 
         # Assign form input to local dict
-        form = {"username": request.form.get("username"), "password": request.form.get("password")}
+        form = {"password": request.form.get("password"),
+                "new password": request.form.get("new password"),
+                "password confirmation": request.form.get("password confirmation")}
 
         # Ensure form was fully filled out
         for form_item in form.items():
@@ -206,15 +208,20 @@ def change_password():
                 message = "must provide " + form_item[0]
                 return render_template("apology.html", message=message, code=400)
 
+        # Ensure old password and new password are not the same
+        if request.form.get("password") == request.form.get("new password"):
+            return render_template("apology.html", message="old password and new password can't be the same", code=400)
+
         # Ensure new password and confirmation match
-        if request.form.get("new password") != request.form.get("confirmation"):
+        if request.form.get("new password") != request.form.get("password confirmation"):
             return render_template("apology.html", message="new password and confirmation don't match", code=400)
 
         # Set new password in database
         hash = generate_password_hash(request.form.get("new password"))
         db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=session["user_id"], hash=hash)
 
-        return render_template("change_password.html")
+        return render_template("index.html")
+
 
 
 @app.route("/triviagame", methods=["GET", "POST"])
@@ -239,7 +246,8 @@ def triviagame():
         session["lives"] = 4
         session["score"] = 0
         session["timer"] = True
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        session["duration"] = 50000
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
 
     # After answering the first answer.
     if request.method == "POST":
@@ -247,7 +255,7 @@ def triviagame():
             user_answer=request.form['answer']
             session["lives"] -= 1
             # If the user is out of lives it's game over.
-            if session["lives"] == 0:
+            if session["lives"] <= 0:
                 return redirect("/")
         session["score"] += 1
         data = new_question()
@@ -256,15 +264,16 @@ def triviagame():
         incorrect_answers = data["incorrect_answers"]
         correct_answer = data["correct_answer"]
         session["correct_answer"] = correct_answer
+        session["duration"] = 50000
         # Makes one list with all possible answers and shuffles it.
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
 
     else:
         session["lives"] -= 1
         # If the user is out of lives it's game over.
-        if session["lives"] == 0:
+        if session["lives"] <= 0:
             return redirect("/")
         session["score"] += 1
         data = new_question()
@@ -276,4 +285,4 @@ def triviagame():
         # Makes one list with all possible answers and shuffles it.
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
