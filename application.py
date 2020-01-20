@@ -117,45 +117,44 @@ def register():
         return render_template("auth/register.html")
 
 
-@app.route("/check", methods=["GET", "POST"])
-def check():
+@app.route("/check_username", methods=["GET"])
+def check_username():
 
-    # Route is reached via GET
-    if request.method == "GET":
+    # Get username from register
+    username = request.args.get("username")
 
-        # Get username from register
-        username = request.args.get("username")
+    # Look for username in database
+    usernames = db.execute("SELECT username FROM users WHERE username= :username", username=username)
 
-        # Look for username in database
-        usernames = db.execute("SELECT username FROM users WHERE username= :username", username=username)
-
-        # Check if username is in database and longer than 1 character
-        if len(usernames) == 0 and len(username) > 0:
-            return jsonify(True)
-        else:
-            return jsonify(False)
-
-    # Reached via POST
+    # Check if username is in database and longer than 1 character
+    if len(usernames) == 0 and len(username) > 1:
+        return jsonify(True)
     else:
-        # Get password
-        password = request.form.get("password")
-        confirmation = request.form.get("confirmation")
+        return jsonify(False)
 
-        # Check if password contains number(s)
-        numbers = [str(number) for number in range(10) if str(number) in password]
 
-        # Check length of password
-        if len(password) >= 6 and len(password) < 20 and len(numbers) > 0 and password.find(" ") == -1:
+@app.route("/check_password", methods=["POST"])
+def check_password():
 
-            if password == confirmation:
-                return jsonify(succes=True, confirmation=True)
+    # Get password
+    password = request.form.get("password")
+    confirmation = request.form.get("confirmation")
 
-            return jsonify(succes=True, confirmation=False)
+    # Check if password contains number(s)
+    numbers = [str(number) for number in range(10) if str(number) in password]
 
-        elif password == confirmation:
-            return jsonify(succes=False, confirmation=True)
+    # Check length of password and conformity of password and confirmation
+    if len(password) >= 6 and len(password) < 20 and len(numbers) > 0 and password.find(" ") == -1:
 
-        return jsonify(succes=False, confirmation=False)
+        if password == confirmation:
+            return jsonify(succes=True, confirmation=True)
+
+        return jsonify(succes=True, confirmation=False)
+
+    elif password == confirmation:
+        return jsonify(succes=False, confirmation=True)
+
+    return jsonify(succes=False, confirmation=False)
 
 
 @app.route("/logout")
