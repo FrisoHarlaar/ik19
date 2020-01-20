@@ -208,7 +208,8 @@ def triviagame():
         session["lives"] = 4
         session["score"] = 0
         session["timer"] = True
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        session["duration"] = 50000
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
 
     # After answering the first answer.
     if request.method == "POST":
@@ -216,7 +217,7 @@ def triviagame():
             user_answer=request.form['answer']
             session["lives"] -= 1
             # If the user is out of lives it's game over.
-            if session["lives"] == 0:
+            if session["lives"] <= 0:
                 return redirect("/")
         session["score"] += 1
         data = new_question()
@@ -225,15 +226,16 @@ def triviagame():
         incorrect_answers = data["incorrect_answers"]
         correct_answer = data["correct_answer"]
         session["correct_answer"] = correct_answer
+        session["duration"] = 50000
         # Makes one list with all possible answers and shuffles it.
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
 
     else:
         session["lives"] -= 1
         # If the user is out of lives it's game over.
-        if session["lives"] == 0:
+        if session["lives"] <= 0:
             return redirect("/")
         session["score"] += 1
         data = new_question()
@@ -245,4 +247,4 @@ def triviagame():
         # Makes one list with all possible answers and shuffles it.
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"])
+        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])

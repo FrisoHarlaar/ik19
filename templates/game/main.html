@@ -7,18 +7,27 @@
 {% block css %}
 <link href="/static/css/game_style.css" rel="stylesheet">
 
-<script type="text/javascript">
+<script src="https://cdn.rawgit.com/kimmobrunfeldt/progressbar.js/0.5.6/dist/progressbar.js"></script>
 
-window.setTimeout('refreshPage()', 5000);
+<script>
+    window.onload = function onLoad() {
+        var circle = new ProgressBar.Circle('#progress', {
+            color: "#fecb4c",
+            strokeWidth: 6,
+            duration: "{{duration|tojson}}",
+            easing: 'easeInOut'
 
-    function refreshPage()
+        });
 
-    {
+        circle.animate(1);
+    };
 
-        window.location = window.location.pathname;
+    window.setTimeout('refreshPage()', "{{ duration }}");
+        function refreshPage()
 
-    }
-
+        {
+            window.location = window.location.pathname;
+        }
 </script>
 {% endblock %}
 
@@ -41,7 +50,7 @@ window.setTimeout('refreshPage()', 5000);
     </div>
 </form>
 <p class="center">To skip a question reload the page.</p>
+
+<img src="/static/images/alarm_clock.png" id="alarm_clock"/>
+<div class="progress" id="progress"></div>
 {% endblock %}
-
-
-
