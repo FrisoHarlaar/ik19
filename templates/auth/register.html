@@ -5,13 +5,14 @@
 {% endblock %}
 
 {% block css %}
-<link href="/static/css/snackbar.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/snackbar.css') }}" rel="stylesheet">
+<script src="{{ url_for('static', filename='javascript/check.js') }}"></script>
 {% endblock %}
 
 {% block main %}
 <h1 class="center title">Register</h1>
 
-    <form id="my_form" action="/register" method="post" onsubmit="check()">
+    <form id="my_form" action="/register" method="post" onsubmit="register_check()">
         <div class="form-group">
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label" for="username">Username</label>
@@ -40,57 +41,9 @@
     <div id="passwordsnackbar" class="snackbar">Your password must be 6-20 characters long, must contain a number and must not contain spaces.</div>
     <div id="confirmsnackbar" class="snackbar">Password and confirmation do not match!</div>
 
-    <script>
-        document.getElementById("my_form").addEventListener("submit", function(event){
-        event.preventDefault();
-        document.getElementById("alert-username").style.display = "none";
-        document.getElementById("username").className = "form-control";
-        document.getElementById("alert-password").style.display = "none";
-        document.getElementById("password").className = "form-control";
-        document.getElementById("alert-confirmation").style.display = "none";
-        document.getElementById("confirmation").className = "form-control";
-        });
-
-        function check() {
-            var my_form = document.querySelector("form");
-            var username = document.querySelector("input[name='username']");
-            var password = document.querySelector("input[name='password']");
-            var confirm = document.querySelector("input[name='confirmation']");
-
-            var user_check = $.get("/check_username?username=" + username.value, function(available) {
-                var availability = $.parseJSON(available);
-                if (availability == false) {
-                    let snackbar = document.getElementById("usersnackbar");
-                    snackbar.classList.add("show");
-                    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 6000);
-                    document.getElementById("username").className = "form-control is-invalid";
-                    my_form.reset();
-                }
-            });
-            var pass_check = $.post("/check_password", {password: password.value, confirmation: confirm.value}, function(correctness) {
-                if (correctness.succes == false) {
-                    let snackbar = document.getElementById("passwordsnackbar");
-                    snackbar.classList.add("show");
-                    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 6000);
-                    document.getElementById("password").className = "form-control is-invalid";
-                    my_form.reset();
-                }
-
-                if (correctness.confirmation == false) {
-                    let snackbar = document.getElementById("confirmsnackbar");
-                    snackbar.classList.add("show");
-                    setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 6000);
-                    document.getElementById("confirmation").className = "form-control is-invalid";
-                    my_form.reset();
-                }
-            });
-            user_check.done(function(availability) {
-                pass_check.done(function(correctness) {
-                    if (availability == true && correctness.succes == true && correctness.confirmation == true) {
-                        my_form.submit();
-                    }
-                });
-            });
-        }
-    </script>
+<script>
+document.getElementById("my_form").addEventListener("submit", function(event){
+    event.preventDefault();
+});
+</script>
 {% endblock %}
