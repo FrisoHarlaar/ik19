@@ -186,6 +186,37 @@ def profile():
         highscore = profile["highscore"]
     return render_template("profile.html", username=username, highscore=highscore)
 
+
+@app.route("/change_username", methods=["GET", "POST"])
+@login_required
+def change_username():
+    """Change username user"""
+    # User reached route via "GET"
+    if request.method == "GET":
+        return render_template("auth/change_username.html")
+
+    # User reached route via POST
+    else:
+
+        # Assign form input to local dict
+        form = {"new username": request.form.get("new username")}
+
+        # Ensure form was fully filled out
+        for form_item in form.items():
+            if form_item[1] == '':
+                message = "must provide " + form_item[0]
+                return render_template("apology.html", message=message, code=400)
+
+        # Ensure new username does not already exists
+        if db.execute("SELECT username FROM users WHERE username = :username", username=request.form.get("new username")):
+            return render_template("apology.html", message="new username not available", code=400)
+
+        # Set new username in database
+        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=request.form.get("new username"))
+
+        return render_template("index.html")
+
+
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -196,6 +227,8 @@ def change_password():
 
     # User reached route via POST
     else:
+
+
 
         # Assign form input to local dict
         form = {"password": request.form.get("password"),
