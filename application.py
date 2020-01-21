@@ -1,5 +1,6 @@
 import os, random, urllib.request
 from cs50 import SQL
+from datetime import date
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -256,7 +257,7 @@ def triviagame():
             session["lives"] -= 1
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
-                return redirect("/")
+                return redirect("/game_over")
         session["score"] += 1
         data = new_question()
          # Takes the question and answers from the data
@@ -274,7 +275,7 @@ def triviagame():
         session["lives"] -= 1
         # If the user is out of lives it's game over.
         if session["lives"] <= 0:
-            return redirect("/")
+            return redirect("/game_over")
         session["score"] += 1
         data = new_question()
          # Takes the question and answers from the data
@@ -286,3 +287,13 @@ def triviagame():
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
         return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
+
+@app.route("/game_over", methods=["GET", "POST"])
+@login_required
+def game_over():
+    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = highscore[0]["highscore"]
+    if session["score"] > highscore:
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        return render_template("game/newrecord.html")
+    return render_template("game/game_over.html")

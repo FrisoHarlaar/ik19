@@ -32,25 +32,34 @@
     margin-bottom: 10%;
 }
 
-#progress
-{
-    height: 100px;
-    background-color: black;
-}
-
-.progress > svg
-{
-    position: absolute;
-    height: 30%;
-    bottom: 100px;
-    left: 100px;
+svg {
+    width: 50%;
     display: block;
 }
 
-#alarm_clock
-{
+.wrapper {
+    position: relative;
+    width: 200px;
+    height: 200px;
+}
+
+.wrapper > #bar, .wrapper > img {
     position: absolute;
-    bottom: 185px;
-    left: 185px;
-    display: block;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.wrapper > img {
+    /* Needs appropriate vendor prefixes */
+    box-sizing: border-box;
+
+    /* This needs to be equal to strokeWidth */
+    padding: 10%;
+}
+
+.wrapper > img {
+    height: 50%;
+    width: 50%;
 }

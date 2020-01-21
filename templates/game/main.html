@@ -11,15 +11,13 @@
 
 <script>
     window.onload = function onLoad() {
-        var circle = new ProgressBar.Circle('#progress', {
+        var circle = new ProgressBar.Circle('#bar', {
             color: "#fecb4c",
             strokeWidth: 6,
             duration: "{{duration|tojson}}",
             easing: 'easeInOut'
-
         });
-
-        circle.animate(1);
+    circle.animate(1);
     };
 
     window.setTimeout('refreshPage()', "{{ duration }}");
@@ -51,6 +49,8 @@
 </form>
 <p class="center">To skip a question reload the page.</p>
 
-<img src="/static/images/alarm_clock.png" id="alarm_clock"/>
-<div class="progress" id="progress"></div>
+<div class="wrapper">
+    <img src="/static/images/alarm_clock.png" />
+    <div id="bar"></div>
+</div>
 {% endblock %}
