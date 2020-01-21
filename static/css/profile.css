@@ -18,17 +18,20 @@ td{
   font-size: 100%;
 }
 
+#rank{
+
+}
+
 #highscore{
   text-align: center;
   padding: 40px 0;
-  font-size: calc(6em + 5vw);
-  white-space: nowrap;
-  background: linear-gradient( 92deg, #95d7e3, #eb76ff );
-  background: -webkit-linear-gradient( 92deg, #95d7e3, #eb76ff );
+  font-size: calc(3em + 2.5vw);
+  background: linear-gradient(#ff0000, #00FF00, #00FFFF, #9400D3);
+  background: -webkit-linear-gradient(#ff0000, #00FF00, #00FFFF, #9400D3);
   background-size:600vw 600vw;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: textAnimate 5s linear infinite alternate;
+  animation: textAnimate 1s linear infinite alternate;
 }
 
 @keyframes textAnimate {
