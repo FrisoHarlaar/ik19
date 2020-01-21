@@ -1,5 +1,6 @@
 import os, random, urllib.request
 from cs50 import SQL
+from datetime import date
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -164,7 +165,46 @@ def profile():
     for profile in profiles:
         username = profile["username"]
         highscore = profile["highscore"]
+
+    # highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    # rank=0
+
+    # for highscore in highscores:
+    #     rank+=1
+    #     if highscore[id] == session["user_id"]:
+    #         pass
+
     return render_template("profile.html", username=username, highscore=highscore)
+
+
+@app.route("/change_username", methods=["GET", "POST"])
+@login_required
+def change_username():
+    """Change username user"""
+    # User reached route via "GET"
+    if request.method == "GET":
+        return render_template("auth/change_username.html")
+
+    # User reached route via POST
+    else:
+
+        # Assign form input to local dict
+        form = {"new username": request.form.get("new username")}
+
+        # Ensure form was fully filled out
+        for form_item in form.items():
+            if form_item[1] == '':
+                message = "must provide " + form_item[0]
+                return render_template("apology.html", message=message, code=400)
+
+        # Ensure new username does not already exists
+        if db.execute("SELECT username FROM users WHERE username = :username", username=request.form.get("new username")):
+            return render_template("apology.html", message="new username not available", code=400)
+
+        # Set new username in database
+        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=request.form.get("new username"))
+
+        return render_template("index.html")
 
 
 @app.route("/change_password", methods=["GET", "POST"])
@@ -177,6 +217,8 @@ def change_password():
 
     # User reached route via POST
     else:
+
+
 
         # Assign form input to local dict
         form = {"password": request.form.get("password"),
@@ -236,7 +278,7 @@ def triviagame():
             session["lives"] -= 1
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
-                return redirect("/")
+                return redirect("/game_over")
         session["score"] += 1
         data = new_question()
          # Takes the question and answers from the data
@@ -254,7 +296,7 @@ def triviagame():
         session["lives"] -= 1
         # If the user is out of lives it's game over.
         if session["lives"] <= 0:
-            return redirect("/")
+            return redirect("/game_over")
         session["score"] += 1
         data = new_question()
          # Takes the question and answers from the data
@@ -266,3 +308,13 @@ def triviagame():
         all_answers = incorrect_answers + [correct_answer]
         random.shuffle(all_answers)
         return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
+
+@app.route("/game_over", methods=["GET", "POST"])
+@login_required
+def game_over():
+    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = highscore[0]["highscore"]
+    if session["score"] > highscore:
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        return render_template("game/newrecord.html")
+    return render_template("game/game_over.html")
