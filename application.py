@@ -184,6 +184,15 @@ def profile():
     for profile in profiles:
         username = profile["username"]
         highscore = profile["highscore"]
+
+    # highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    # rank=0
+
+    # for highscore in highscores:
+    #     rank+=1
+    #     if highscore[id] == session["user_id"]:
+    #         pass
+
     return render_template("profile.html", username=username, highscore=highscore)
 
 
