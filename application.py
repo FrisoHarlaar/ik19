@@ -41,9 +41,11 @@ def dashboard():
     username, highscore = rows[0]["username"], rows[0]["highscore"]
     return render_template("dashboard.html", username=username, highscore=highscore)
 
+
 @app.route("/index")
 def index():
     return render_template("index.html")
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -79,6 +81,7 @@ def login():
 
         # Redirect user to home page
         return redirect("/")
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -133,30 +136,6 @@ def check_username():
         return jsonify(False)
 
 
-@app.route("/check_password", methods=["POST"])
-def check_password():
-
-    # Get password
-    password = request.form.get("password")
-    confirmation = request.form.get("confirmation")
-
-    # Check if password contains number(s)
-    numbers = [str(number) for number in range(10) if str(number) in password]
-
-    # Check length of password and conformity of password and confirmation
-    if len(password) >= 6 and len(password) < 20 and len(numbers) > 0 and password.find(" ") == -1:
-
-        if password == confirmation:
-            return jsonify(succes=True, confirmation=True)
-
-        return jsonify(succes=True, confirmation=False)
-
-    elif password == confirmation:
-        return jsonify(succes=False, confirmation=True)
-
-    return jsonify(succes=False, confirmation=False)
-
-
 @app.route("/logout")
 @login_required
 def logout():
@@ -173,6 +152,7 @@ def leaderboard():
     "Show the leaderboard of the 50 best players"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
     return render_template("game/leaderboard.html", highscores=highscores)
+
 
 @app.route("/profile", methods=["GET"])
 @login_required
@@ -263,7 +243,6 @@ def change_password():
         db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=session["user_id"], hash=hash)
 
         return render_template("index.html")
-
 
 
 @app.route("/triviagame", methods=["GET", "POST"])
