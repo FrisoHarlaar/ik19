@@ -311,9 +311,10 @@ def triviagame():
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
+    session["timer"] = False
     highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]
     if session["score"] > highscore:
         db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
-        return render_template("game/newrecord.html")
+        return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")

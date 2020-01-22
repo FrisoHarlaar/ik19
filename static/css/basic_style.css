@@ -3,6 +3,12 @@
     src: url('../Baloo-Regular.woff') format('woff');
 }
 
+.navbar
+{
+    background-color: rgba(0,0,0,0.8);;
+}
+
+
 .nav-link
 {
     color: #ee5f5b;

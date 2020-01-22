@@ -5,26 +5,33 @@
 {% endblock %}
 
 {% block css %}
-<link href="/static/css/game_style.css" rel="stylesheet">
+<link href="/static/css/fireworks.css" rel="stylesheet">
+{% endblock %}
 
-<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
-<script src="https://raw.githubusercontent.com/mgrigajtis/jquery-fireworks/master/jquery.fireworks.js"></script>
-
+{% block body %}
 
 {% endblock %}
 
 {% block main %}
-<h1 class="center title">NEW RECORD</h1>
+    {% for firework in range(3) %}
+        <div class="firework" id="firework{{ firework }}">
+            {% for explsion in range(12) %}
+                <div class="explosion"></div>
+            {% endfor %}
+        </div>
+    {% endfor %}
 
-<div class="demo">
+<h1 class="center title">NEW RECORD!!!<br>
+{{ score }}</h1>
+<p  class="center">(celebrate with some fireworks)</p>
+
+<!-- buttons -->
+<div class="mx-auto">
+    <a href="/triviagame">
+        <button class="btn btn-lg">Try again</button>
+    </a>
+    <a href="/">
+        <button class="btn btn-lg">Quit</button>
+    </a>
 </div>
-
-<script>
-$('.demo').fireworks({
-  sound: true, // sound effect
-  opacity: 0.9,
-  width: '100%',
-  height: '100%'
-});
-</script>
 {% endblock %}
