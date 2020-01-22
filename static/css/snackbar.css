@@ -23,6 +23,10 @@
   margin-left: 0px;
 }
 
+#loginsnackbar {
+  margin-left: -125px;
+}
+
 .snackbar.show {
   visibility: visible;
   -webkit-animation: fadein 0.5s, fadeout 0.5s 5.5s;
