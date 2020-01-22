@@ -166,15 +166,14 @@ def profile():
         username = profile["username"]
         highscore = profile["highscore"]
 
-    # highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    # rank=0
+    users = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    rank=0
+    for user in users:
+        rank+=1
+        if user["id"] == session["user_id"]:
+            break
 
-    # for highscore in highscores:
-    #     rank+=1
-    #     if highscore[id] == session["user_id"]:
-    #         pass
-
-    return render_template("profile.html", username=username, highscore=highscore)
+    return render_template("profile.html", username=username, highscore=highscore, rank=rank)
 
 
 @app.route("/change_username", methods=["GET", "POST"])
