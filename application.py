@@ -83,6 +83,23 @@ def login():
         return redirect("/")
 
 
+@app.route("/check_login", methods=["POST"])
+def check_login():
+
+    username = request.form.get("username")
+    password = request.form.get("password")
+
+    # look for username in database
+    rows = db.execute("SELECT * FROM users WHERE username = :username",
+                         username=username)
+
+    # check if username exists and if password is correct
+    if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
+        return jsonify(False)
+    else:
+        return jsonify(True)
+
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -123,7 +140,7 @@ def register():
 @app.route("/check_username", methods=["GET"])
 def check_username():
 
-    # Get username from register
+    # Get username from form
     username = request.args.get("username")
 
     # Look for username in database
@@ -165,15 +182,14 @@ def profile():
         username = profile["username"]
         highscore = profile["highscore"]
 
-    # highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    # rank=0
+    users = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    rank=0
+    for user in users:
+        rank+=1
+        if user["id"] == session["user_id"]:
+            break
 
-    # for highscore in highscores:
-    #     rank+=1
-    #     if highscore[id] == session["user_id"]:
-    #         pass
-
-    return render_template("profile.html", username=username, highscore=highscore)
+    return render_template("profile.html", username=username, highscore=highscore, rank=rank)
 
 
 @app.route("/change_username", methods=["GET", "POST"])
