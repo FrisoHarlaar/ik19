@@ -13,13 +13,15 @@ th{
 }
 
 td{
-  color:black;
+  color: black;
   height: 100px;
   font-size: 100%;
 }
 
 #rank{
-
+  font-size: 60px;
+  color: #FFFFFF;
+  text-shadow: 2px 2px 0 #4074b5, 2px -2px 0 #4074b5, -2px 2px 0 #4074b5, -2px -2px 0 #4074b5, 2px 0px 0 #4074b5, 0px 2px 0 #4074b5, -2px 0px 0 #4074b5, 0px -2px 0 #4074b5;
 }
 
 #highscore{

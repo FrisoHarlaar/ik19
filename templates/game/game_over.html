@@ -1,15 +1,22 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    New Record!!!
+    GAME OVER
 {% endblock %}
 
 {% block css %}
-<link href="/static/css/game_style.css" rel="stylesheet">
-
-<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+<link href="/static/css/fireworks.css" rel="stylesheet">
 {% endblock %}
 
 {% block main %}
 <h1 class="center title">GAME OVER</h1>
+<p  class="center">(you gonna cry?)</p>
+<div class="mx-auto">
+    <a href="/triviagame">
+        <button class="btn btn-lg">Try again</button>
+    </a>
+    <a href="/">
+        <button class="btn btn-lg">Quit</button>
+    </a>
+</div>
 {% endblock %}

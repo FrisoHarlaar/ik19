@@ -22,12 +22,13 @@
             </th>
         </tr>
         <tr>
-            <th>Personal best</th>
-            <td id=highscore>{{ highscore }} !</td>
+            <th>Rank</th>
+            <td id=rank>#{{ rank }}</td>
+            <td><img src="/static/images/sports-medal.png" width="100" height="100" alt="medaille"</td>
         </tr>
         <tr>
-            <th>Rank</th>
-            <td id=rank><img src="/static/images/afbeelding_medaille.png" width="75" height="131" alt="medaille"</td>
+            <th>Personal best</th>
+            <td id=highscore>{{ highscore }}</td>
         </tr>
     </table>
 {% endblock %}

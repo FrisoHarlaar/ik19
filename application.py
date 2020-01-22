@@ -189,15 +189,14 @@ def profile():
         username = profile["username"]
         highscore = profile["highscore"]
 
-    # highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    # rank=0
+    users = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    rank=0
+    for user in users:
+        rank+=1
+        if user["id"] == session["user_id"]:
+            break
 
-    # for highscore in highscores:
-    #     rank+=1
-    #     if highscore[id] == session["user_id"]:
-    #         pass
-
-    return render_template("profile.html", username=username, highscore=highscore)
+    return render_template("profile.html", username=username, highscore=highscore, rank=rank)
 
 
 @app.route("/change_username", methods=["GET", "POST"])
@@ -352,9 +351,10 @@ def triviagame():
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
+    session["timer"] = False
     highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]
     if session["score"] > highscore:
         db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
-        return render_template("game/newrecord.html")
+        return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
