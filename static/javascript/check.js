@@ -43,13 +43,31 @@ function pass_check(id, id2) {
 
 
 function user_check() {
-    document.getElementById("username").className = "form-control";
-    var username = document.getElementById("username");
+    document.getElementById("newusername").className = "form-control";
+    var username = document.getElementById("newusername");
     var user = $.get("/check_username?username=" + username.value);
 
     return user;
 }
 
+function change_user() {
+    user_check().done(function(user) {
+
+        /* get form */
+        var my_form = document.querySelector("form");
+
+        /* show snackbar-error if username is taken */
+        snackbar(user, "loginsnackbar", "newusername");
+
+        /* if username is free submit else reset form */
+        if (user == true) {
+            my_form.submit();
+        }
+        else {
+            my_form.reset();
+        }
+    });
+}
 
 function register_check() {
 
@@ -126,7 +144,7 @@ function change_pass() {
     else {
         /* check if old password is correct */
         $.post("/check_changepass", {oldpassword: old_password}, function(status) {
-            
+
             /* check if new password meets requirements */
             var pass = pass_check("newpassword", "confirmation");
 
