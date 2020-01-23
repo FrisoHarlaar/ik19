@@ -1,4 +1,4 @@
-import os, random, urllib.request
+import os, urllib.request
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
@@ -266,63 +266,64 @@ def change_password():
 def triviagame():
     # When the user first starts up the game.
     if request.method == "GET" and session["timer"] == False:
+
         # Clears the session (except for the user ID) so the user can start a new game.
         user_id = session["user_id"]
         session.clear()
         session["user_id"] = user_id
-        # Returns a dict within a list within a dict!!!
+
+        # Returns the required data for the question.
         data = new_question()
-        # Takes the question and answers from the data
-        question = data["question"]
-        incorrect_answers = data["incorrect_answers"]
-        correct_answer = data["correct_answer"]
-        session["correct_answer"] = correct_answer
-        # Makes one list with all possible answers and shuffles it.
-        all_answers = incorrect_answers + [correct_answer]
-        random.shuffle(all_answers)
+
+        # Set standard variables for the start of the game.
+        session["correct_answer"] = data["correct_answer"]
         session["lives"] = 4
         session["score"] = 0
         session["timer"] = True
         session["duration"] = 50000
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
+        return render_template("game/main.html",
+        lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
     # After answering the first answer.
     if request.method == "POST":
+
+        # Checks if the user answered the question correctly.
         if request.form['answer'] != session["correct_answer"]:
             user_answer=request.form['answer']
             session["lives"] -= 1
+
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
                 return redirect("/game_over")
-        session["score"] += 1
-        data = new_question()
-         # Takes the question and answers from the data
-        question = data["question"]
-        incorrect_answers = data["incorrect_answers"]
-        correct_answer = data["correct_answer"]
-        session["correct_answer"] = correct_answer
-        session["duration"] = 50000
-        # Makes one list with all possible answers and shuffles it.
-        all_answers = incorrect_answers + [correct_answer]
-        random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
+        return redirect("/question_setup")
 
+    # Activates when the timer runs out.
     else:
         session["lives"] -= 1
         # If the user is out of lives it's game over.
         if session["lives"] <= 0:
             return redirect("/game_over")
         session["score"] += 1
-        data = new_question()
-         # Takes the question and answers from the data
-        question = data["question"]
-        incorrect_answers = data["incorrect_answers"]
-        correct_answer = data["correct_answer"]
-        session["correct_answer"] = correct_answer
-        # Makes one list with all possible answers and shuffles it.
-        all_answers = incorrect_answers + [correct_answer]
-        random.shuffle(all_answers)
-        return render_template("game/main.html", lives=session["lives"], question=question, answers=all_answers, score=session["score"], duration=session["duration"])
+        return redirect("/question_setup")
+
+
+@app.route("/question_setup", methods=["GET", "POST"])
+@login_required
+def setup():
+    # Returns the required data for the question.
+    data = new_question()
+
+    # Takes the question and answers from the data
+    session["correct_answer"] = data["correct_answer"]
+    session["score"] += 1
+
+    # The player gains a life and the time window shrinks after 10 questions.
+    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
+        session["duration"] -= 5000
+        if session["lives"] < 4:
+            session["lives"] += 1
+    return render_template("game/main.html",
+    lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
