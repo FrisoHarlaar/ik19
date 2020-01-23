@@ -27,6 +27,18 @@
   margin-left: -125px;
 }
 
+#samesnackbar {
+  margin-left: 270px;
+}
+
+#changesnackbar {
+  margin-left: 270px;
+}
+
+#oldsnackbar {
+  margin-left: -270px;
+}
+
 .snackbar.show {
   visibility: visible;
   -webkit-animation: fadein 0.5s, fadeout 0.5s 5.5s;

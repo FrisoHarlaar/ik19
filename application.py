@@ -119,7 +119,14 @@ def register():
         if not form["password"] == form["confirmation"]:
             return render_template("apology.html", message="password and confirmation do not match", code=400)
 
-        # hash password and insert data into database (we hebben nog geen database)
+        # check if password contains any numbers
+        numbers = any([char.isdigit() for char in form["password"]])
+
+        # check if password meets requirements
+        if len(form["password"]) < 6 or len(form["password"]) >= 20 or form["password"].find(" ") != -1 or not numbers:
+            return render_template("apology.html", message="password does not meet the requirements", code=400)
+
+        # hash password and insert data into database
         hashed_password = generate_password_hash(form["password"])
         available = db.execute("INSERT INTO users (username, hash, highscore) VALUES (:username, :password, :hs)",
                             username=form["username"], password=hashed_password, hs=0)
@@ -233,8 +240,6 @@ def change_password():
     # User reached route via POST
     else:
 
-
-
         # Assign form input to local dict
         form = {"password": request.form.get("password"),
                 "new password": request.form.get("new password"),
@@ -247,18 +252,36 @@ def change_password():
                 return render_template("apology.html", message=message, code=400)
 
         # Ensure old password and new password are not the same
-        if request.form.get("password") == request.form.get("new password"):
+        if form["password"] == form["new password"]:
             return render_template("apology.html", message="old password and new password can't be the same", code=400)
 
         # Ensure new password and confirmation match
-        if request.form.get("new password") != request.form.get("password confirmation"):
+        if form["new password"] != form["password confirmation"]:
             return render_template("apology.html", message="new password and confirmation don't match", code=400)
 
         # Set new password in database
-        hash = generate_password_hash(request.form.get("new password"))
+        hash = generate_password_hash(form["new password"])
         db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=session["user_id"], hash=hash)
 
         return render_template("index.html")
+
+
+@app.route("/check_changepass", methods=["POST"])
+def check_changepass():
+
+    # retrieve user input and id
+    old_password = request.form.get("oldpassword")
+    user_id = session["user_id"]
+
+    # look for user_id in database
+    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
+                         user_id=user_id)
+
+    # check if username exists and if password is correct
+    if check_password_hash(rows[0]["hash"], old_password):
+        return jsonify(True)
+    else:
+        return jsonify(False)
 
 
 @app.route("/triviagame", methods=["GET", "POST"])
@@ -324,6 +347,7 @@ def setup():
             session["lives"] += 1
     return render_template("game/main.html",
     lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
 
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
