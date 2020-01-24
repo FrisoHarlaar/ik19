@@ -86,7 +86,17 @@ function add_friend() {
             my_form.reset();
         }
         else if (user == false) {
-            my_form.submit();
+            $.post("/check_friend", {friendname:friend}, function(check) {
+                var my_form = document.querySelector("form");
+
+                if (check == true) {
+                    my_form.submit();
+                }
+                else {
+                    snackbar(false, "friendsnackbar", "friendname", false);
+                    my_form.reset();
+                }
+            });
         }
         else {
             my_form.reset();

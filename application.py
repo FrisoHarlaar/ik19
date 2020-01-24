@@ -154,7 +154,7 @@ def check_username():
 
     # Look for username in database
     usernames = db.execute("SELECT username FROM users WHERE username= :username", username=username)
-    print(usernames, username, len(usernames) == 0, len(username))
+
     # Check if username is in database and longer than 1 character
     if len(usernames) == 0 and len(username) > 1:
         return jsonify(True)
@@ -202,7 +202,7 @@ def delete_friend():
     # User reached route via POST
     if request.method == "POST":
         friendname = request.form.get("friendname")
-        print(friendname)
+
         # Delete friend from database
         db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
 
@@ -222,15 +222,31 @@ def add_friend():
     if request.method == "POST":
         friendname = request.form.get("friendname")
         friend = db.execute("SELECT username FROM users WHERE username= :username", username=friendname)
-        print(friendname)
+
         if not friend:
             return render_template("apology.html", message="Username does not exist!", code=400)
+        friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+
+        if friends:
+            return render_template("apology.html", message="You already have this friend", code=400)
 
         db.execute("INSERT INTO friends (user_id, friendname) VALUES (:user_id, :friendname)", user_id=session["user_id"], friendname=friendname)
         return redirect("/friends")
     else:
         return render_template("friends/add_friend.html")
 
+
+@app.route("/check_friend", methods=["POST"])
+def check_friend():
+
+    friendname = request.form.get("friendname")
+    print(friendname)
+    friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+
+    if friends:
+        return jsonify(False)
+    else:
+        return jsonify(True)
 
 @app.route("/profile", methods=["GET"])
 @login_required
