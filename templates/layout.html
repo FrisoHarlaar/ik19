@@ -22,6 +22,7 @@
 
     <body>
         <nav class="navbar fixed-top navbar-expand-md">
+            {% block error %}{% endblock %}
             <div class="collapse navbar-collapse" id="navbar">
                 {% if session.user_id %}
                     <ul class="navbar-nav mr-auto mt-2">
