@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Friends
+{% endblock %}
+
+{% block css %}
+<link href="/static/css/index_style.css" rel="stylesheet">
+{% endblock %}
+
+{% block error %}
+    <div id="loginsnackbar" class="snackbar">Username does not exist!</div>
+{% endblock %}
+
+{% block main %}
+    <p>
+        <br>
+        <br>
+    </p>
+    <a href="/add_friend"><button type="button" class="btn btn-lg">Add friend</button></a>
+    <a href="/delete_friend"><button type="submit" class="btn btn-lg">Delete friend</button></a>
+    </br>
+    </br>
+    <table id=table class="table table-striped" style="width:100%">
+        <link href="/static/css/leaderboard.css" rel="stylesheet">
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+        <tr>
+            <td><strong>You</strong></td>
+            <td><strong>{{ yourscore.date }}</strong></td>
+            <td><strong>{{ yourscore.highscore }}</strong></td>
+        </tr>
+    {% for highscore in highscores %}
+        <tr>
+            <td>{{ highscore.username }}</td>
+            <td>{{ highscore.date }}</td>
+            <td>{{ highscore.highscore }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

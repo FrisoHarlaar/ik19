@@ -154,7 +154,7 @@ def check_username():
 
     # Look for username in database
     usernames = db.execute("SELECT username FROM users WHERE username= :username", username=username)
-
+    print(usernames, username, len(usernames) == 0, len(username))
     # Check if username is in database and longer than 1 character
     if len(usernames) == 0 and len(username) > 1:
         return jsonify(True)
@@ -178,6 +178,58 @@ def leaderboard():
     "Show the leaderboard of the 50 best players"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
     return render_template("game/leaderboard.html", highscores=highscores)
+
+
+@app.route("/friends", methods=["GET"])
+@login_required
+def friends():
+
+    # get current users friends
+    friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id", user_id=session["user_id"])])
+
+    highscores = sum([db.execute("SELECT username, highscore, date FROM users WHERE username=:username", username=friend) for friend in friends], [])
+    highscores = sorted(highscores, key=lambda k:k["highscore"], reverse=True)
+
+    yourscore = db.execute("SELECT highscore, date FROM users WHERE id=:user_id", user_id=session["user_id"])
+    return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
+
+
+
+@app.route("/delete_friend", methods=["GET", "POST"])
+@login_required
+def delete_friend():
+
+    # User reached route via POST
+    if request.method == "POST":
+        friendname = request.form.get("friendname")
+        print(friendname)
+        # Delete friend from database
+        db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+
+        return redirect("/friends")
+    # User reached route via GET
+    else:
+
+        # Get friends from database
+        friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id",
+                                                                        user_id=session["user_id"])])
+        return render_template("friends/delete_friend.html", friends=friends)
+
+
+@app.route("/add_friend", methods=["GET", "POST"])
+@login_required
+def add_friend():
+    if request.method == "POST":
+        friendname = request.form.get("friendname")
+        friend = db.execute("SELECT username FROM users WHERE username= :username", username=friendname)
+        print(friendname)
+        if not friend:
+            return render_template("apology.html", message="Username does not exist!", code=400)
+
+        db.execute("INSERT INTO friends (user_id, friendname) VALUES (:user_id, :friendname)", user_id=session["user_id"], friendname=friendname)
+        return redirect("/friends")
+    else:
+        return render_template("friends/add_friend.html")
 
 
 @app.route("/profile", methods=["GET"])
@@ -368,3 +420,5 @@ def game_over():
         db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
+
+

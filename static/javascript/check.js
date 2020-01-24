@@ -1,7 +1,7 @@
-function snackbar(status, snackbarid, id) {
+function snackbar(status, snackbarid, id, value) {
 
     /* show error-snackbar if status is false */
-    if (status == false) {
+    if (status == value) {
         let snackbar = document.getElementById(snackbarid);
         snackbar.classList.add("show");
         setTimeout(function(){ snackbar.className = snackbar.className.replace("show", ""); }, 6000);
@@ -57,10 +57,35 @@ function change_user() {
         var my_form = document.querySelector("form");
 
         /* show snackbar-error if username is taken */
-        snackbar(user, "loginsnackbar", "newusername");
+        snackbar(user, "loginsnackbar", "newusername", false);
 
         /* if username is free submit else reset form */
-        if (user == true) {
+        if (user == false) {
+            my_form.submit();
+        }
+        else {
+            my_form.reset();
+        }
+    });
+}
+
+function add_friend() {
+    user_check("friendname").done(function(user) {
+
+        /* get form */
+        var my_form = document.querySelector("form");
+
+        /* show snackbar-error if username is taken */
+        snackbar(user, "loginsnackbar", "friendname", true);
+
+        /* if friend exists and is not empty submit else reset form */
+        var friend = document.getElementById("friendname").value;
+        console.log([user, friend]);
+        if (friend.length < 1) {
+            snackbar(false, "loginsnackbar", "friendname", false);
+            my_form.reset();
+        }
+        else if (user == false) {
             my_form.submit();
         }
         else {
@@ -76,9 +101,9 @@ function register_check() {
         var pass = pass_check("password", "confirmation");
 
         /* show error snackbars */
-        snackbar(pass[0], "passwordsnackbar", "password");
-        snackbar(pass[1], "confirmsnackbar", "confirmation");
-        snackbar(user, "usersnackbar", "username");
+        snackbar(pass[0], "passwordsnackbar", "password", false);
+        snackbar(pass[1], "confirmsnackbar", "confirmation", false);
+        snackbar(user, "usersnackbar", "username", false);
 
         /* get form */
         var my_form = document.querySelector("form");
@@ -112,7 +137,7 @@ function login_check() {
 
         /* reset form and show error if user input is false */
         if (user == false) {
-            snackbar(user, "loginsnackbar", "username");
+            snackbar(user, "loginsnackbar", "username", false);
             document.getElementById("password").className = "form-control is-invalid";
             my_form.reset();
         }
@@ -141,7 +166,7 @@ function change_pass() {
 
     /* error if old and new password are equal */
     if (old_password == new_password) {
-        snackbar(false, "samesnackbar", "oldpassword");
+        snackbar(false, "samesnackbar", "oldpassword", false);
         my_form.reset();
     }
     else {
@@ -151,9 +176,9 @@ function change_pass() {
             /* check if new password meets requirements */
             var pass = pass_check("newpassword", "confirmation");
 
-            snackbar(pass[0], "changesnackbar", "newpassword");
-            snackbar(pass[1], "confirmsnackbar", "confirmation");
-            snackbar(status, "oldsnackbar", "oldpassword");
+            snackbar(pass[0], "changesnackbar", "newpassword", false);
+            snackbar(pass[1], "confirmsnackbar", "confirmation", false);
+            snackbar(status, "oldsnackbar", "oldpassword", false);
 
             /* get form */
             var my_form = document.querySelector("form");
