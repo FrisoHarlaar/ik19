@@ -1,8 +1,9 @@
 .transition_block{
-    animation: transitionIn 1s;
+    animation: transition 1s;
 }
 
-@keyframes transitionIn{
+
+@keyframes transition{
     from{
         opacity: 0;
         transform: translate3d(100%, 0, 0);
