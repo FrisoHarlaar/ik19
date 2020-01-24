@@ -333,6 +333,8 @@ def triviagame():
 @app.route("/question_setup", methods=["GET", "POST"])
 @login_required
 def setup():
+
+    # If the player refreshes the page a live is taken.
     if session["refresh"] == True:
         session["lives"] -= 1
         if session["lives"] <= 0:
@@ -349,6 +351,8 @@ def setup():
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
+
+    # Sets a value when the page is refreshed.
     session["refresh"] = True
     return render_template("game/main.html",
     lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
