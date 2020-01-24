@@ -9,6 +9,12 @@
 <script src="{{ url_for('static', filename='javascript/check.js') }}"></script>
 {% endblock %}
 
+{% block error %}
+    <div id="usersnackbar" class="snackbar">Username already taken!</div>
+    <div id="passwordsnackbar" class="snackbar">Your password must be 6-20 characters long, must contain a number and must not contain spaces.</div>
+    <div id="confirmsnackbar" class="snackbar">Password and confirmation do not match!</div>
+{% endblock %}
+
 {% block main %}
 <h1 class="center title">Register</h1>
 
@@ -36,10 +42,9 @@
             </div>
         </div>
         <button class="btn btn-lg" type="submit">Register</button>
+        </br>
+        <div class="redirectmessage">Already have an account? <a href="/login">Login here!</a></div>
     </form>
-    <div id="usersnackbar" class="snackbar">Username already taken!</div>
-    <div id="passwordsnackbar" class="snackbar">Your password must be 6-20 characters long, must contain a number and must not contain spaces.</div>
-    <div id="confirmsnackbar" class="snackbar">Password and confirmation do not match!</div>
 
 <script>
 document.getElementById("my_form").addEventListener("submit", function(event){

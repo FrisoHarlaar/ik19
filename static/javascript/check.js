@@ -42,16 +42,16 @@ function pass_check(id, id2) {
 }
 
 
-function user_check() {
-    document.getElementById("newusername").className = "form-control";
-    var username = document.getElementById("newusername");
+function user_check(id) {
+    document.getElementById(id).className = "form-control";
+    var username = document.getElementById(id);
     var user = $.get("/check_username?username=" + username.value);
 
     return user;
 }
 
 function change_user() {
-    user_check().done(function(user) {
+    user_check("newusername").done(function(user) {
 
         /* get form */
         var my_form = document.querySelector("form");
@@ -72,7 +72,7 @@ function change_user() {
 function register_check() {
 
     /* work with data from async user_check */
-    user_check().done(function(user){
+    user_check("username").done(function(user){
         var pass = pass_check("password", "confirmation");
 
         /* show error snackbars */
@@ -135,6 +135,9 @@ function change_pass() {
 
     /* error if confirmation isn't equal to password */
     snackbar((confirmation == new_password), "confirmsnackbar", "confirmation");
+
+    /* error if password field is empty */
+    snackbar((old_password != ""), "emptysnackbar", "oldpassword");
 
     /* error if old and new password are equal */
     if (old_password == new_password) {
