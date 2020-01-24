@@ -312,12 +312,12 @@ def triviagame():
 
         # Checks if the user answered the question correctly.
         if request.form['answer'] != session["correct_answer"]:
-            user_answer=request.form['answer']
             session["lives"] -= 1
 
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
                 return redirect("/game_over")
+        session["refresh"] = False
         return redirect("/question_setup")
 
     # Activates when the timer runs out.
@@ -326,13 +326,17 @@ def triviagame():
         # If the user is out of lives it's game over.
         if session["lives"] <= 0:
             return redirect("/game_over")
-        session["score"] += 1
+        session["refresh"] = False
         return redirect("/question_setup")
 
 
 @app.route("/question_setup", methods=["GET", "POST"])
 @login_required
 def setup():
+    if session["refresh"] == True:
+        session["lives"] -= 1
+        if session["lives"] <= 0:
+            return redirect("/game_over")
     # Returns the required data for the question.
     data = new_question()
 
@@ -345,6 +349,7 @@ def setup():
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
+    session["refresh"] = True
     return render_template("game/main.html",
     lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
