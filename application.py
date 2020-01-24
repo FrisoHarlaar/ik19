@@ -34,9 +34,11 @@ Session(app)
 @login_required
 def dashboard():
     session["timer"] = False
+
     # Query database for userdata
-    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
-                    user_id=session["user_id"])
+    rows = db.execute("SELECT username, highscore FROM users WHERE id = :user_id",
+                        user_id=session["user_id"])
+
     # Take the username and highscore
     username, highscore = rows[0]["username"], rows[0]["highscore"]
     return render_template("dashboard.html", username=username, highscore=highscore)
@@ -70,10 +72,10 @@ def login():
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
-                         username=request.form.get("username"))
+                         username=form["username"])
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], form["password"]):
             return render_template("apology.html", message="invalid username and/or password", code=400)
 
         # Remember which user has logged in
@@ -182,17 +184,17 @@ def leaderboard():
 @login_required
 def profile():
     # Query database for user
-    profiles = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
+    profiles = db.execute("SELECT (username, highscore) FROM users WHERE id= :user_id", user_id=session["user_id"])
 
     # Select for user: username and highscore
     for profile in profiles:
         username = profile["username"]
         highscore = profile["highscore"]
 
-    users = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    rank=0
+    users = db.execute("SELECT id FROM users ORDER BY highscore DESC, date;")
+    rank = 0
     for user in users:
-        rank+=1
+        rank += 1
         if user["id"] == session["user_id"]:
             break
 
@@ -211,20 +213,18 @@ def change_username():
     else:
 
         # Assign form input to local dict
-        form = {"new username": request.form.get("new username")}
+        new_username = request.form.get("new username")
 
         # Ensure form was fully filled out
-        for form_item in form.items():
-            if form_item[1] == '':
-                message = "must provide " + form_item[0]
-                return render_template("apology.html", message=message, code=400)
+        if new_username == '':
+            return render_template("apology.html", message="must provide username", code=400)
 
         # Ensure new username does not already exists
-        if db.execute("SELECT username FROM users WHERE username = :username", username=request.form.get("new username")):
+        if db.execute("SELECT username FROM users WHERE username = :username", username=new_username):
             return render_template("apology.html", message="new username not available", code=400)
 
         # Set new username in database
-        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=request.form.get("new username"))
+        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=new_username)
 
         return render_template("index.html")
 
@@ -274,11 +274,11 @@ def check_changepass():
     user_id = session["user_id"]
 
     # look for user_id in database
-    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
+    old_hash = db.execute("SELECT hash FROM users WHERE id = :user_id",
                          user_id=user_id)
 
     # check if username exists and if password is correct
-    if check_password_hash(rows[0]["hash"], old_password):
+    if check_password_hash(old_hash, old_password):
         return jsonify(True)
     else:
         return jsonify(False)
