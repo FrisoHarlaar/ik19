@@ -20,7 +20,7 @@
     position: static;
     text-align: left;
     margin-top: 1%;
-    margin-bottom: 5%;
+    margin-bottom: 2%;
     margin-left: 30%;
 }
 
@@ -43,7 +43,8 @@ svg {
     height: 200px;
 }
 
-.wrapper > #bar, .wrapper > img {
+.wrapper > #bar, .wrapper > img
+{
     position: absolute;
     top: 150%;
     left: 0;
@@ -51,15 +52,14 @@ svg {
     height: 100%;
 }
 
-.wrapper > img {
-    /* Needs appropriate vendor prefixes */
+.wrapper > img
+{
     box-sizing: border-box;
-
-    /* This needs to be equal to strokeWidth */
     padding: 10%;
 }
 
-.wrapper > img {
+.wrapper > img
+{
     height: 50%;
     width: 50%;
 }
