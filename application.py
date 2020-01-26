@@ -438,3 +438,86 @@ def game_over():
     return render_template("game/game_over.html")
 
 
+@app.route("/reverseTriviagame", methods=["GET", "POST"])
+@login_required
+def reverseTriviagame():
+    # When the user first starts up the game.
+    if request.method == "GET" and session["timer"] == False:
+
+        # Clears the session (except for the user ID) so the user can start a new game.
+        user_id = session["user_id"]
+        session.clear()
+        session["user_id"] = user_id
+
+        # Returns the required data for the question.
+        data = new_question()
+
+        # Set standard variables for the start of the game.
+        session["correct_answer"] = data["correct_answer"]
+        session["lives"] = 4
+        session["score"] = 0
+        session["timer"] = True
+        session["duration"] = 50000
+        return render_template("game/mainReverse.html",
+        lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
+    # After answering the first answer.
+    if request.method == "POST":
+
+        # Checks if the user answered the question correctly.
+        if request.form['answer'] != session["correct_answer"]:
+            session["lives"] -= 1
+
+            # If the user is out of lives it's game over.
+            if session["lives"] <= 0:
+                return redirect("/reverse_game_over")
+        session["refresh"] = False
+        return redirect("/reverse_question_setup")
+
+    # Activates when the timer runs out.
+    else:
+        session["lives"] -= 1
+        # If the user is out of lives it's game over.
+        if session["lives"] <= 0:
+            return redirect("/reverse_game_over")
+        session["refresh"] = False
+        return redirect("/reverse_question_setup")
+
+
+@app.route("/reverse_question_setup", methods=["GET", "POST"])
+@login_required
+def reverse_question_setup():
+
+    # If the player refreshes the page a live is taken.
+    if session["refresh"] == True:
+        session["lives"] -= 1
+        if session["lives"] <= 0:
+            return redirect("/reverse_game_over")
+    # Returns the required data for the question.
+    data = new_question()
+
+    # Takes the question and answers from the data
+    session["correct_answer"] = data["correct_answer"]
+    session["score"] += 3
+
+    # The player gains a life and the time window shrinks after 10 questions.
+    if session["duration"] >= 10000 and session["score"] % 30 == 0 and session["score"] != 0:
+        session["duration"] -= 5000
+        if session["lives"] < 4:
+            session["lives"] += 1
+
+    # Sets a value when the page is refreshed.
+    session["refresh"] = True
+    return render_template("game/mainReverse.html",
+    lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
+@app.route("/reverse_game_over", methods=["GET", "POST"])
+@login_required
+def reverse_game_over():
+    session["timer"] = False
+    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = highscore[0]["highscore"]
+    if session["score"] > highscore:
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        return render_template("game/newrecord.html", score=session["score"])
+    return render_template("game/game_over.html")
