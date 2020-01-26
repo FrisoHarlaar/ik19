@@ -37,7 +37,7 @@ function pass_check(id, id2) {
     else {
     correctness = [false, false];
     }
-
+    console.log(correctness);
     return correctness;
 }
 
@@ -58,9 +58,9 @@ function change_user() {
 
         /* show snackbar-error if username is taken */
         snackbar(user, "loginsnackbar", "newusername", false);
-
+        console.log(user);
         /* if username is free submit else reset form */
-        if (user == false) {
+        if (user == true) {
             my_form.submit();
         }
         else {
@@ -189,7 +189,7 @@ function change_pass() {
             snackbar(pass[0], "changesnackbar", "newpassword", false);
             snackbar(pass[1], "confirmsnackbar", "confirmation", false);
             snackbar(status, "oldsnackbar", "oldpassword", false);
-
+            console.log(status, pass);
             /* get form */
             var my_form = document.querySelector("form");
 

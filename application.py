@@ -343,8 +343,8 @@ def check_changepass():
 
     # look for user_id in database
     old_hash = db.execute("SELECT hash FROM users WHERE id = :user_id",
-                         user_id=user_id)
-
+                         user_id=user_id)[0]["hash"]
+    print(check_password_hash(old_hash, old_password), old_password, old_hash)
     # check if username exists and if password is correct
     if check_password_hash(old_hash, old_password):
         return jsonify(True)
