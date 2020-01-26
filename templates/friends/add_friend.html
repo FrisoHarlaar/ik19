@@ -5,8 +5,9 @@
 {% endblock %}
 
 {% block error %}
-  <div id="loginsnackbar" class="snackbar">Friend doesn't exist!</div>
-    <div id="friendsnackbar" class="snackbar">User is already your friend!</div>
+  <div id="existsnackbar" class="snackbar snackbarmid">Friend doesn't exist!</div>
+  <div id="friendsnackbar" class="snackbar snackbarmid">User is already your friend!</div>
+  <div id="yousnackbar" class="snackbar snackbarmid">You can't add yourself as a friend!</div>
 {% endblock %}
 
 {% block main %}

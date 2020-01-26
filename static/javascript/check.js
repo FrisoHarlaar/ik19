@@ -57,7 +57,7 @@ function change_user() {
         var my_form = document.querySelector("form");
 
         /* show snackbar-error if username is taken */
-        snackbar(user, "loginsnackbar", "newusername", false);
+        snackbar(user, "usersnackbar", "newusername", false);
         console.log(user);
         /* if username is free submit else reset form */
         if (user == true) {
@@ -75,25 +75,29 @@ function add_friend() {
         /* get form */
         var my_form = document.querySelector("form");
 
-        /* show snackbar-error if username is taken */
-        snackbar(user, "loginsnackbar", "friendname", true);
+        /* show snackbar-error if username doesn't exist */
+        snackbar(user, "existsnackbar", "friendname", true);
 
         /* if friend exists and is not empty submit else reset form */
         var friend = document.getElementById("friendname").value;
-        console.log([user, friend]);
+
         if (friend.length < 1) {
-            snackbar(false, "loginsnackbar", "friendname", false);
+            snackbar(false, "existsnackbar", "friendname", false);
             my_form.reset();
         }
         else if (user == false) {
             $.post("/check_friend", {friendname:friend}, function(check) {
                 var my_form = document.querySelector("form");
 
-                if (check == true) {
+                if (check[0] == true && check[1] == true) {
                     my_form.submit();
                 }
-                else {
+                else if (check[0] == false) {
                     snackbar(false, "friendsnackbar", "friendname", false);
+                    my_form.reset();
+                }
+                else {
+                    snackbar(false, "yousnackbar", "friendname", false);
                     my_form.reset();
                 }
             });

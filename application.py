@@ -240,13 +240,16 @@ def add_friend():
 def check_friend():
 
     friendname = request.form.get("friendname")
-    print(friendname)
-    friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+    user_id = session["user_id"]
+    friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=user_id, friendname=friendname)
+    username = db.execute("SELECT username FROM users WHERE id= :user_id", user_id=user_id)[0]["username"]
 
     if friends:
-        return jsonify(False)
+        return jsonify(False, True)
+    elif friendname == username:
+        return jsonify(True, False)
     else:
-        return jsonify(True)
+        return jsonify(True, True)
 
 @app.route("/profile", methods=["GET"])
 @login_required

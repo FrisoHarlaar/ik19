@@ -11,40 +11,24 @@
   top: 30px;
 }
 
-#usersnackbar {
-  margin-left: -270px;
-}
-
-#passwordsnackbar {
-  margin-left: 270px;
-}
-
-#confirmsnackbar {
-  margin-left: 0px;
-}
-
-#loginsnackbar {
+.snackbarmid {
   margin-left: -125px;
 }
 
-#samesnackbar {
-  margin-left: 270px;
-}
-
-#changesnackbar {
-  margin-left: 270px;
-}
-
-#oldsnackbar {
-  margin-left: -270px;
-}
-
-#emptysnackbar {
+.snackbarleft {
   margin-left: -540px;
 }
 
-#friendsnackbar {
-  margin-left: -125px;
+.snackbarmidleft {
+  margin-left: -270px;
+}
+
+.snackbarmidright {
+  margin-left: 0px;
+}
+
+.snackbarright {
+  margin-left: 270px;
 }
 
 .snackbar.show {
