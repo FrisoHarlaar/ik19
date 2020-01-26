@@ -252,7 +252,7 @@ def check_friend():
 @login_required
 def profile():
     # Query database for user
-    profiles = db.execute("SELECT (username, highscore) FROM users WHERE id= :user_id", user_id=session["user_id"])
+    profiles = db.execute("SELECT username, highscore FROM users WHERE id= :user_id", user_id=session["user_id"])
 
     # Select for user: username and highscore
     for profile in profiles:
