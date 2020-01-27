@@ -34,9 +34,11 @@ Session(app)
 @login_required
 def dashboard():
     session["timer"] = False
+
     # Query database for userdata
-    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
-                    user_id=session["user_id"])
+    rows = db.execute("SELECT username, highscore FROM users WHERE id = :user_id",
+                        user_id=session["user_id"])
+
     # Take the username and highscore
     username, highscore = rows[0]["username"], rows[0]["highscore"]
     return render_template("dashboard.html", username=username, highscore=highscore)
@@ -70,10 +72,10 @@ def login():
 
         # Query database for username
         rows = db.execute("SELECT * FROM users WHERE username = :username",
-                         username=request.form.get("username"))
+                         username=form["username"])
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], form["password"]):
             return render_template("apology.html", message="invalid username and/or password", code=400)
 
         # Remember which user has logged in
@@ -178,21 +180,92 @@ def leaderboard():
     return render_template("game/leaderboard.html", highscores=highscores)
 
 
+@app.route("/friends", methods=["GET"])
+@login_required
+def friends():
+
+    # get current users friends
+    friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id", user_id=session["user_id"])])
+
+    highscores = sum([db.execute("SELECT username, highscore, date FROM users WHERE username=:username", username=friend) for friend in friends], [])
+    highscores = sorted(highscores, key=lambda k:k["highscore"], reverse=True)
+
+    yourscore = db.execute("SELECT highscore, date FROM users WHERE id=:user_id", user_id=session["user_id"])
+    return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
+
+
+
+@app.route("/delete_friend", methods=["GET", "POST"])
+@login_required
+def delete_friend():
+
+    # User reached route via POST
+    if request.method == "POST":
+        friendname = request.form.get("friendname")
+
+        # Delete friend from database
+        db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+
+        return redirect("/friends")
+    # User reached route via GET
+    else:
+
+        # Get friends from database
+        friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id",
+                                                                        user_id=session["user_id"])])
+        return render_template("friends/delete_friend.html", friends=friends)
+
+
+@app.route("/add_friend", methods=["GET", "POST"])
+@login_required
+def add_friend():
+    if request.method == "POST":
+        friendname = request.form.get("friendname")
+        friend = db.execute("SELECT username FROM users WHERE username= :username", username=friendname)
+
+        if not friend:
+            return render_template("apology.html", message="Username does not exist!", code=400)
+        friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+
+        if friends:
+            return render_template("apology.html", message="You already have this friend", code=400)
+
+        db.execute("INSERT INTO friends (user_id, friendname) VALUES (:user_id, :friendname)", user_id=session["user_id"], friendname=friendname)
+        return redirect("/friends")
+    else:
+        return render_template("friends/add_friend.html")
+
+
+@app.route("/check_friend", methods=["POST"])
+def check_friend():
+
+    friendname = request.form.get("friendname")
+    user_id = session["user_id"]
+    friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=user_id, friendname=friendname)
+    username = db.execute("SELECT username FROM users WHERE id= :user_id", user_id=user_id)[0]["username"]
+
+    if friends:
+        return jsonify(False, True)
+    elif friendname == username:
+        return jsonify(True, False)
+    else:
+        return jsonify(True, True)
+
 @app.route("/profile", methods=["GET"])
 @login_required
 def profile():
     # Query database for user
-    profiles = db.execute("SELECT * FROM users WHERE id=:id", id=session["user_id"])
+    profiles = db.execute("SELECT username, highscore FROM users WHERE id= :user_id", user_id=session["user_id"])
 
     # Select for user: username and highscore
     for profile in profiles:
         username = profile["username"]
         highscore = profile["highscore"]
 
-    users = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    rank=0
+    users = db.execute("SELECT id FROM users ORDER BY highscore DESC, date;")
+    rank = 0
     for user in users:
-        rank+=1
+        rank += 1
         if user["id"] == session["user_id"]:
             break
 
@@ -211,20 +284,18 @@ def change_username():
     else:
 
         # Assign form input to local dict
-        form = {"new username": request.form.get("new username")}
+        new_username = request.form.get("new username")
 
         # Ensure form was fully filled out
-        for form_item in form.items():
-            if form_item[1] == '':
-                message = "must provide " + form_item[0]
-                return render_template("apology.html", message=message, code=400)
+        if new_username == '':
+            return render_template("apology.html", message="must provide username", code=400)
 
         # Ensure new username does not already exists
-        if db.execute("SELECT username FROM users WHERE username = :username", username=request.form.get("new username")):
+        if db.execute("SELECT username FROM users WHERE username = :username", username=new_username):
             return render_template("apology.html", message="new username not available", code=400)
 
         # Set new username in database
-        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=request.form.get("new username"))
+        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=new_username)
 
         return render_template("index.html")
 
@@ -274,11 +345,11 @@ def check_changepass():
     user_id = session["user_id"]
 
     # look for user_id in database
-    rows = db.execute("SELECT * FROM users WHERE id = :user_id",
-                         user_id=user_id)
-
+    old_hash = db.execute("SELECT hash FROM users WHERE id = :user_id",
+                         user_id=user_id)[0]["hash"]
+    print(check_password_hash(old_hash, old_password), old_password, old_hash)
     # check if username exists and if password is correct
-    if check_password_hash(rows[0]["hash"], old_password):
+    if check_password_hash(old_hash, old_password):
         return jsonify(True)
     else:
         return jsonify(False)
@@ -361,6 +432,91 @@ def setup():
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
+    session["timer"] = False
+    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = highscore[0]["highscore"]
+    if session["score"] > highscore:
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        return render_template("game/newrecord.html", score=session["score"])
+    return render_template("game/game_over.html")
+
+
+@app.route("/reverseTriviagame", methods=["GET", "POST"])
+@login_required
+def reverseTriviagame():
+    # When the user first starts up the game.
+    if request.method == "GET" and session["timer"] == False:
+
+        # Clears the session (except for the user ID) so the user can start a new game.
+        user_id = session["user_id"]
+        session.clear()
+        session["user_id"] = user_id
+
+        # Returns the required data for the question.
+        data = new_question()
+
+        # Set standard variables for the start of the game.
+        session["correct_answer"] = data["correct_answer"]
+        session["lives"] = 4
+        session["score"] = 0
+        session["timer"] = True
+        session["duration"] = 50000
+        return render_template("game/mainReverse.html",
+        lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
+    # After answering the first answer.
+    if request.method == "POST":
+
+        # Checks if the user answered the question correctly.
+        if request.form['answer'] != session["correct_answer"]:
+            session["lives"] -= 1
+
+            # If the user is out of lives it's game over.
+            if session["lives"] <= 0:
+                return redirect("/reverse_game_over")
+        session["refresh"] = False
+        return redirect("/reverse_question_setup")
+
+    # Activates when the timer runs out.
+    else:
+        session["lives"] -= 1
+        # If the user is out of lives it's game over.
+        if session["lives"] <= 0:
+            return redirect("/reverse_game_over")
+        session["refresh"] = False
+        return redirect("/reverse_question_setup")
+
+
+@app.route("/reverse_question_setup", methods=["GET", "POST"])
+@login_required
+def reverse_question_setup():
+
+    # If the player refreshes the page a live is taken.
+    if session["refresh"] == True:
+        session["lives"] -= 1
+        if session["lives"] <= 0:
+            return redirect("/reverse_game_over")
+    # Returns the required data for the question.
+    data = new_question()
+
+    # Takes the question and answers from the data
+    session["correct_answer"] = data["correct_answer"]
+    session["score"] += 3
+
+    # The player gains a life and the time window shrinks after 10 questions.
+    if session["duration"] >= 10000 and session["score"] % 30 == 0 and session["score"] != 0:
+        session["duration"] -= 5000
+        if session["lives"] < 4:
+            session["lives"] += 1
+
+    # Sets a value when the page is refreshed.
+    session["refresh"] = True
+    return render_template("game/mainReverse.html",
+    lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
+@app.route("/reverse_game_over", methods=["GET", "POST"])
+@login_required
+def reverse_game_over():
     session["timer"] = False
     highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]

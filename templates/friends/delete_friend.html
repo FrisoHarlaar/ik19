@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Delete friend
+{% endblock %}
+
+{% block error %}
+  <div id="loginsnackbar" class="snackbar">Invalid username or password!</div>
+{% endblock %}
+
+{% block main %}
+<h1 class="center title" style="margin-top: 5%; margin-bottom: 5%;">Delete Friend</h1>
+
+<form id="my_form" action="/delete_friend" method="post">
+  <div class="form-group row">
+    <label for="friendname" class="col-sm-2 col-form-label">Friend username</label>
+    <div class="col-sm-10">
+        <select required class="form-control" name="friendname">
+            <option disabled selected value>Friends</option>
+            {% for friend in friends %}
+                <option name="friend">{{ friend }}</option>
+            {% endfor %}
+        </select>
+    </div>
+ </div>
+ <button type="submit" class="btn btn-lg">Delete friend</button>
+ <div>Add a friend instead? <a href="/add_friend">Do it here!</a></div>
+</form>
+{% endblock %}
