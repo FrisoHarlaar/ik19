@@ -528,7 +528,7 @@ def reverse_game_over():
 
     # get users highscore
     highscore = db.execute("SELECT highscore_mirror FROM users WHERE id=:id", id=session["user_id"])
-    highscore = highscore[0]["highscore"]
+    highscore = highscore[0]["highscore_mirror"]
 
     # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
@@ -536,3 +536,13 @@ def reverse_game_over():
                     user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
+
+
+@app.route("/leaderboard_mirror")
+def leaderboard_mirror():
+    "Show the leaderboard of the 50 best players in Mirror mode"
+    highscores = db.execute("SELECT * FROM users ORDER BY highscore_mirror DESC, date;")
+    if len(highscores) > 50:
+        highscores = [highscores[i] for i in range(50)]
+
+    return render_template("game/leaderboard_mirror.html", highscores=highscores)

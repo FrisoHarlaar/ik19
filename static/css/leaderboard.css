@@ -15,3 +15,33 @@ td {
   background-color: black;
   font-size: 120%;
 }
+
+#reverseTitle
+{
+  -moz-transform: scale(-1, 1);
+  -webkit-transform: scale(-1, 1);
+  -o-transform: scale(-1, 1);
+  -ms-transform: scale(-1, 1);
+  transform: scale(-1, 1);
+  background-color: black;
+  font-size: 170%;
+}
+
+#title{
+  background-color: black;
+  font-size: 170%;
+}
+
+.button{
+  background-color: #ee5f5b;
+  color: white;
+  padding: 15px 25px;
+  text-align: center;
+  cursor: pointer;
+  font-family: Baloo Regular, Baloo;
+}
+
+.button:hover {
+  background-color: red;
+  color: white;
+}
