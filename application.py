@@ -128,7 +128,7 @@ def register():
 
         # hash password and insert data into database
         hashed_password = generate_password_hash(form["password"])
-        available = db.execute("INSERT INTO users (username, hash, highscore) VALUES (:username, :password, :hs)",
+        available = db.execute("INSERT INTO users (username, hash, highscore, highscore_mirror) VALUES (:username, :password, :hs, :hs)",
                             username=form["username"], password=hashed_password, hs=0)
 
         # Give error if username is not available
@@ -175,7 +175,6 @@ def logout():
 def leaderboard():
     "Show the leaderboard of the 50 best players"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    highscores = [highscores[i] for i in range(50)]
 
     return render_template("game/leaderboard.html", highscores=highscores)
 
@@ -507,7 +506,7 @@ def reverse_question_setup():
     session["score"] += 1
 
     # The player gains a life and the time window shrinks after 10 questions.
-    if session["duration"] >= 10000 and session["score"] % 30 == 0 and session["score"] != 0:
+    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
@@ -525,12 +524,12 @@ def reverse_game_over():
     session["timer"] = False
 
     # get users highscore
-    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = db.execute("SELECT highscore_mirror FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]
 
     # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
+        db.execute("UPDATE users SET highscore_mirror = :score, date = CURRENT_DATE WHERE id = :user_id",
                     user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
