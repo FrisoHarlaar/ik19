@@ -175,7 +175,8 @@ def logout():
 def leaderboard():
     "Show the leaderboard of the 50 best players"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
-    highscores = [highscores[i] for i in range(50)]
+    if len(highscores) > 50:
+        highscores = [highscores[i] for i in range(50)]
 
     return render_template("game/leaderboard.html", highscores=highscores)
 
@@ -394,7 +395,8 @@ def triviagame():
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
                 return redirect("/game_over")
-
+        session["score"] += 1
+        return redirect("/question_setup")
 
 
     # Activates when the timer runs out.
