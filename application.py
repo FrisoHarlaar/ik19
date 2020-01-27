@@ -3,7 +3,7 @@ from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import login_required, new_question
+from helpers import login_required, new_question, get_db
 from tempfile import mkdtemp
 
 # Configure application
@@ -36,8 +36,7 @@ def dashboard():
     session["timer"] = False
 
     # Query database for userdata
-    rows = db.execute("SELECT username, highscore FROM users WHERE id = :user_id",
-                        user_id=session["user_id"])
+    rows = get_db(["username", "highscore"], "users", "id", session["user_id"])
 
     # Take the username and highscore
     username, highscore = rows[0]["username"], rows[0]["highscore"]
@@ -71,8 +70,7 @@ def login():
                 return render_template("apology.html", message=message, code=400)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username",
-                         username=form["username"])
+        rows = get_db(["*"], "users", "username", form["username"])
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], form["password"]):
@@ -383,13 +381,14 @@ def triviagame():
 
         # Checks if the user answered the question correctly.
         if request.form['answer'] != session["correct_answer"]:
+            user_answer=request.form['answer']
             session["lives"] -= 1
 
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
                 return redirect("/game_over")
-        session["refresh"] = False
-        return redirect("/question_setup")
+
+
 
     # Activates when the timer runs out.
     else:
@@ -397,34 +396,24 @@ def triviagame():
         # If the user is out of lives it's game over.
         if session["lives"] <= 0:
             return redirect("/game_over")
-        session["refresh"] = False
+        session["score"] += 1
         return redirect("/question_setup")
 
 
 @app.route("/question_setup", methods=["GET", "POST"])
 @login_required
 def setup():
-
-    # If the player refreshes the page a live is taken.
-    if session["refresh"] == True:
-        session["lives"] -= 1
-        if session["lives"] <= 0:
-            return redirect("/game_over")
     # Returns the required data for the question.
     data = new_question()
 
     # Takes the question and answers from the data
     session["correct_answer"] = data["correct_answer"]
-    session["score"] += 1
 
     # The player gains a life and the time window shrinks after 10 questions.
     if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
-
-    # Sets a value when the page is refreshed.
-    session["refresh"] = True
     return render_template("game/main.html",
     lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 

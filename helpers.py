@@ -1,6 +1,10 @@
 import os, urllib.request, json, urllib.parse, requests, random
 from flask import redirect, render_template, request, session
 from functools import wraps
+from cs50 import SQL
+
+# Configure CS50 Library to use SQLite database
+db = SQL("sqlite:///brainbrawlers.db")
 
 def login_required(f):
 
@@ -28,3 +32,16 @@ def new_question():
         data["all_answers"] = data["incorrect_answers"] + [data["correct_answer"]]
         random.shuffle(data["all_answers"])
         return data
+
+# Function to easily get data from the database.
+# Items need to be a list of the requested item(s).
+def get_db(items, table, key, value):
+    string = "SELECT "
+
+    for item in items:
+        if item != items[0]:
+            string += ", "
+
+        string += str(item)
+    string += " FROM " + table + " WHERE " + key + "= :key"
+    return db.execute(string, key=str(value))
