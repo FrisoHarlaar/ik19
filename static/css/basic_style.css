@@ -21,7 +21,7 @@ body
     background-color: #000000;
 }
 
-main
+#main
 {
     /* scroll horizontally as needed */
     overflow-x: auto;
