@@ -4,6 +4,10 @@
 
 }
 
+#main {
+    overflow-x: hidden;
+}
+
 #score
 {
     font-family: Baloo Regular, Baloo;

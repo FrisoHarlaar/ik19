@@ -175,6 +175,8 @@ def logout():
 def leaderboard():
     "Show the leaderboard of the 50 best players"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    highscores = [highscores[i] for i in range(50)]
+
     return render_template("game/leaderboard.html", highscores=highscores)
 
 
@@ -185,9 +187,13 @@ def friends():
     # get current users friends
     friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id", user_id=session["user_id"])])
 
+    # get highscores from every friend
     highscores = sum([db.execute("SELECT username, highscore, date FROM users WHERE username=:username", username=friend) for friend in friends], [])
+
+    # sort friend highscores
     highscores = sorted(highscores, key=lambda k:k["highscore"], reverse=True)
 
+    # get users highscore and date
     yourscore = db.execute("SELECT highscore, date FROM users WHERE id=:user_id", user_id=session["user_id"])
     return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
 
@@ -205,6 +211,7 @@ def delete_friend():
         db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
 
         return redirect("/friends")
+
     # User reached route via GET
     else:
 
@@ -345,7 +352,7 @@ def check_changepass():
     # look for user_id in database
     old_hash = db.execute("SELECT hash FROM users WHERE id = :user_id",
                          user_id=user_id)[0]["hash"]
-    print(check_password_hash(old_hash, old_password), old_password, old_hash)
+
     # check if username exists and if password is correct
     if check_password_hash(old_hash, old_password):
         return jsonify(True)
@@ -421,11 +428,18 @@ def setup():
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
+
+    # stop game
     session["timer"] = False
+
+    # get users highscore
     highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]
+
+    # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
+                    user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
 
@@ -490,7 +504,7 @@ def reverse_question_setup():
 
     # Takes the question and answers from the data
     session["correct_answer"] = data["correct_answer"]
-    session["score"] += 3
+    session["score"] += 1
 
     # The player gains a life and the time window shrinks after 10 questions.
     if session["duration"] >= 10000 and session["score"] % 30 == 0 and session["score"] != 0:
@@ -506,10 +520,17 @@ def reverse_question_setup():
 @app.route("/reverse_game_over", methods=["GET", "POST"])
 @login_required
 def reverse_game_over():
+
+    # stop game
     session["timer"] = False
+
+    # get users highscore
     highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
     highscore = highscore[0]["highscore"]
+
+    # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id", user_id=session["user_id"], score=session["score"])
+        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
+                    user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
