@@ -26,3 +26,13 @@
     -ms-transform: scale(-1, 1);
     transform: scale(-1, 1);
 }
+
+#pb{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+td {
+  padding: 0px 70px;
+  vertical-align: top;
+}

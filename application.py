@@ -36,11 +36,11 @@ def dashboard():
     session["timer"] = False
 
     # Query database for userdata
-    rows = get_db(["username", "highscore"], "users", "id", session["user_id"])
+    rows = get_db(["username", "highscore", "highscore_mirror"], "users", "id", session["user_id"])
 
     # Take the username and highscore
-    username, highscore = rows[0]["username"], rows[0]["highscore"]
-    return render_template("dashboard.html", username=username, highscore=highscore)
+    username, highscore, highscore_mirror = rows[0]["username"], rows[0]["highscore"], rows[0]["highscore_mirror"]
+    return render_template("dashboard.html", username=username, highscore=highscore, highscore_mirror=highscore_mirror)
 
 
 @app.route("/index")
