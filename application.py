@@ -3,7 +3,7 @@ from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import login_required, new_question, get_db
+from helpers import login_required, new_question, get_db, update_db, insdel_db
 from tempfile import mkdtemp
 
 # Configure application
@@ -90,8 +90,7 @@ def check_login():
     password = request.form.get("password")
 
     # look for username in database
-    rows = db.execute("SELECT * FROM users WHERE username = :username",
-                         username=username)
+    rows = get_db(["*"], "users", "username", username)
 
     # check if username exists and if password is correct
     if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
@@ -128,14 +127,13 @@ def register():
 
         # hash password and insert data into database
         hashed_password = generate_password_hash(form["password"])
-        available = db.execute("INSERT INTO users (username, hash, highscore, highscore_mirror) VALUES (:username, :password, :hs, :hs)",
-                            username=form["username"], password=hashed_password, hs=0)
+        available = insdel_db("available", form["username"], hashed_password)
 
         # Give error if username is not available
         if not available:
             return render_template("apology.html", message="username not available", code=400)
 
-        session["user_id"] = (db.execute("SELECT id FROM users WHERE username= :username", username=form["username"])[0]["id"])
+        session["user_id"] = (get_db(["id"], "users", "username", form["username"])[0]["id"])
 
         return redirect("/")
 
@@ -151,7 +149,7 @@ def check_username():
     username = request.args.get("username")
 
     # Look for username in database
-    usernames = db.execute("SELECT username FROM users WHERE username= :username", username=username)
+    usernames = get_db(["username"], "users", "username", username)
 
     # Check if username is in database and longer than 1 character
     if len(usernames) == 0 and len(username) > 1:
@@ -174,7 +172,8 @@ def logout():
 @app.route("/leaderboard")
 def leaderboard():
     "Show the leaderboard of the 50 best players"
-    highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    highscores = get_db(["*"], "users", None, None, ["highscore DESC", "date"])
+
     if len(highscores) > 50:
         highscores = [highscores[i] for i in range(50)]
 
@@ -186,16 +185,16 @@ def leaderboard():
 def friends():
 
     # get current users friends
-    friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id", user_id=session["user_id"])])
+    friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
 
     # get highscores from every friend
-    highscores = sum([db.execute("SELECT username, highscore, date FROM users WHERE username=:username", username=friend) for friend in friends], [])
+    highscores = sum([get_db(["username", "highscore", "date"], "users", "username", friend) for friend in friends], [])
 
     # sort friend highscores
     highscores = sorted(highscores, key=lambda k:k["highscore"], reverse=True)
 
     # get users highscore and date
-    yourscore = db.execute("SELECT highscore, date FROM users WHERE id=:user_id", user_id=session["user_id"])
+    yourscore = get_db(["highscore", "date"], "users", "id", session["user_id"])
     return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
 
 
@@ -209,7 +208,7 @@ def delete_friend():
         friendname = request.form.get("friendname")
 
         # Delete friend from database
-        db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+        insdel_db("del_friends", session["user_id"], friendname)
 
         return redirect("/friends")
 
@@ -217,8 +216,8 @@ def delete_friend():
     else:
 
         # Get friends from database
-        friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id",
-                                                                        user_id=session["user_id"])])
+        friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
+
         return render_template("friends/delete_friend.html", friends=friends)
 
 
@@ -227,16 +226,16 @@ def delete_friend():
 def add_friend():
     if request.method == "POST":
         friendname = request.form.get("friendname")
-        friend = db.execute("SELECT username FROM users WHERE username= :username", username=friendname)
+        friend = get_db(["username"], "users", "username", friendname)
 
         if not friend:
             return render_template("apology.html", message="Username does not exist!", code=400)
-        friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=session["user_id"], friendname=friendname)
+        friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
 
         if friends:
             return render_template("apology.html", message="You already have this friend", code=400)
 
-        db.execute("INSERT INTO friends (user_id, friendname) VALUES (:user_id, :friendname)", user_id=session["user_id"], friendname=friendname)
+        insdel_db("ins_friends", session["user_id"], friendname)
         return redirect("/friends")
     else:
         return render_template("friends/add_friend.html")
@@ -247,8 +246,8 @@ def check_friend():
 
     friendname = request.form.get("friendname")
     user_id = session["user_id"]
-    friends = db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=user_id, friendname=friendname)
-    username = db.execute("SELECT username FROM users WHERE id= :user_id", user_id=user_id)[0]["username"]
+    friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
+    username = get_db(["username"], "users", "id", user_id)[0]["username"]
 
     if friends:
         return jsonify(False, True)
@@ -261,14 +260,14 @@ def check_friend():
 @login_required
 def profile():
     # Query database for user
-    profiles = db.execute("SELECT username, highscore FROM users WHERE id= :user_id", user_id=session["user_id"])
+    profiles = get_db(["username", "highscore"], "users", "id", session["user_id"])
 
     # Select for user: username and highscore
     for profile in profiles:
         username = profile["username"]
         highscore = profile["highscore"]
 
-    users = db.execute("SELECT id FROM users ORDER BY highscore DESC, date;")
+    users = get_db(["id"], "users", None, None, ["highscore DESC, date"])
     rank = 0
     for user in users:
         rank += 1
@@ -297,11 +296,11 @@ def change_username():
             return render_template("apology.html", message="must provide username", code=400)
 
         # Ensure new username does not already exists
-        if db.execute("SELECT username FROM users WHERE username = :username", username=new_username):
+        if get_db(["username"], "users", "username", new_username):
             return render_template("apology.html", message="new username not available", code=400)
 
         # Set new username in database
-        db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=session["user_id"], username=new_username)
+        update_db("username", session["user_id"], new_username)
 
         return render_template("index.html")
 
@@ -338,7 +337,7 @@ def change_password():
 
         # Set new password in database
         hash = generate_password_hash(form["new password"])
-        db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=session["user_id"], hash=hash)
+        update_db("hash", session["user_id"], hash)
 
         return render_template("index.html")
 
@@ -351,8 +350,7 @@ def check_changepass():
     user_id = session["user_id"]
 
     # look for user_id in database
-    old_hash = db.execute("SELECT hash FROM users WHERE id = :user_id",
-                         user_id=user_id)[0]["hash"]
+    old_hash = get_db(['hash'], "users", "id", user_id)[0]["hash"]
 
     # check if username exists and if password is correct
     if check_password_hash(old_hash, old_password):
@@ -435,13 +433,12 @@ def game_over():
     session["timer"] = False
 
     # get users highscore
-    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
+    highscore = get_db(["highscore"], "users", "id", session["user_id"])
     highscore = highscore[0]["highscore"]
 
     # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
-                    user_id=session["user_id"], score=session["score"])
+        update_db("highscore", session["user_id"], session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
 
@@ -527,13 +524,12 @@ def reverse_game_over():
     session["timer"] = False
 
     # get users highscore
-    highscore = db.execute("SELECT highscore_mirror FROM users WHERE id=:id", id=session["user_id"])
+    highscore = get_db(["highscore_mirror"], "users", "id", session["user_id"])
     highscore = highscore[0]["highscore_mirror"]
 
     # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore_mirror = :score, date = CURRENT_DATE WHERE id = :user_id",
-                    user_id=session["user_id"], score=session["score"])
+        update_db("highscore_mirror", session["user_id"], session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
 
@@ -541,7 +537,7 @@ def reverse_game_over():
 @app.route("/leaderboard_mirror")
 def leaderboard_mirror():
     "Show the leaderboard of the 50 best players in Mirror mode"
-    highscores = db.execute("SELECT * FROM users ORDER BY highscore_mirror DESC, date;")
+    highscores = get_db(["*"], "users", None, None, ["highscore_mirror DESC", "date"])
     if len(highscores) > 50:
         highscores = [highscores[i] for i in range(50)]
 
