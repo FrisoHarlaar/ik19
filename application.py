@@ -174,9 +174,12 @@ def logout():
 @app.route("/leaderboard")
 def leaderboard():
     "Show the leaderboard of the 50 best players"
+    # Get highscores in database
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
+    # Only 50 best players on leaderboard
     if len(highscores) > 50:
-        highscores = [highscores[i] for i in range(50)]
+        highscores = [(i, highscores[i]) for i in range(1, 51)]
 
     return render_template("game/leaderboard.html", highscores=highscores)
 
@@ -542,7 +545,8 @@ def reverse_game_over():
 def leaderboard_mirror():
     "Show the leaderboard of the 50 best players in Mirror mode"
     highscores = db.execute("SELECT * FROM users ORDER BY highscore_mirror DESC, date;")
+    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
     if len(highscores) > 50:
-        highscores = [highscores[i] for i in range(50)]
+        highscores = [(i+1, highscores[i]) for i in range(50)]
 
     return render_template("game/leaderboard_mirror.html", highscores=highscores)

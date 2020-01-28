@@ -20,12 +20,14 @@
             <th id="reverseTitle" colspan="3">Leaderboard Mirror mode</th>
         </tr>
         <tr>
+            <th>Rank</th>
             <th>Name</th>
             <th>Date</th>
             <th>Score</th>
         </tr>
-    {% for highscore in highscores %}
         <tr>
+    {% for (rank, highscore) in highscores %}
+            <td>#{{ rank }}</td>
             <td>{{ highscore.username }}</td>
             <td>{{ highscore.date }}</td>
             <td>{{ highscore.highscore_mirror }}</td>
