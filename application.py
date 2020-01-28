@@ -373,14 +373,14 @@ def triviagame():
         session["user_id"] = user_id
 
         # Returns the required data for the question.
-        data = new_question()
+        data = new_question("easy")
 
         # Set standard variables for the start of the game.
         session["correct_answer"] = data["correct_answer"]
         session["lives"] = 4
         session["score"] = 0
         session["timer"] = True
-        session["duration"] = 50000
+        session["duration"] = 30000
         return render_template("game/main.html",
         lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
@@ -388,43 +388,37 @@ def triviagame():
     if request.method == "POST":
 
         # Checks if the user answered the question correctly.
-        if request.form['answer'] != session["correct_answer"]:
-            user_answer=request.form['answer']
+        if request.form.get("answer") != session["correct_answer"]:
             session["lives"] -= 1
 
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
-                return redirect("/game_over")
+                return jsonify(False)
         session["score"] += 1
-        return redirect("/question_setup")
+        return setup()
 
-
-    # Activates when the timer runs out.
+    # Activates when page is refreshed
     else:
-        session["lives"] -= 1
-        # If the user is out of lives it's game over.
-        if session["lives"] <= 0:
-            return redirect("/game_over")
-        session["score"] += 1
-        return redirect("/question_setup")
+        return redirect("/game_over")
 
-
-@app.route("/question_setup", methods=["GET", "POST"])
-@login_required
 def setup():
     # Returns the required data for the question.
-    data = new_question()
+    if session["score"] <= 10:
+        data = new_question("easy")
+    elif session["score"] <= 20:
+        data = new_question("medium")
+    else:
+        data = new_question("hard")
 
     # Takes the question and answers from the data
     session["correct_answer"] = data["correct_answer"]
-
+    print(session["score"], session["duration"], session["lives"])
     # The player gains a life and the time window shrinks after 10 questions.
     if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
-    return render_template("game/main.html",
-    lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
 
 @app.route("/game_over", methods=["GET", "POST"])

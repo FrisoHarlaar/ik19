@@ -16,10 +16,10 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-def new_question():
+def new_question(difficulty):
 
         # Gets a question from the opentdb database.
-        with urllib.request.urlopen("https://opentdb.com/api.php?amount=1") as url:
+        with urllib.request.urlopen(f"https://opentdb.com/api.php?amount=1&difficulty={difficulty}") as url:
             rows = json.loads(url.read().decode())
 
         # Takes the question and answers from the data
