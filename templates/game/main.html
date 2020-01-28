@@ -38,7 +38,7 @@
 <noscript>Your browser needs to support javascript in order for our site to work!</noscript>
 <script>
     function new_question(input) {
-        $("#transition").addClass('reverse_transition_block');
+        $("#transition").addClass('transition_block_away');
         answers = $.post("/triviagame", {answer: input}).done(function(data) {
             window.clearTimeout(time);
             timer(data.duration);
@@ -72,7 +72,7 @@
                 for (i = 0; i < data.answers.length; i++) {
                     document.getElementById("answers").innerHTML += "<button type='submit' name='answer' value='" + data.answers[i] + "' class='btn answer'>" + data.answers[i] + "</button>";
                 }
-                $("#transition").removeClass('reverse_transition_block');
+                $("#transition").removeClass('transition_block_away');
                 $("#transition").addClass('transition_block');
 
                 circle = new ProgressBar.Circle('#bar', {

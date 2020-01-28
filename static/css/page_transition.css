@@ -14,11 +14,11 @@
     }
 }
 
-.reverse_transition_block{
-    animation: reverseTransition 1s;
+.transition_block_away{
+    animation: transition_away 1s;
 }
 
-@keyframes reverseTransition{
+@keyframes transition_away{
     from{
         opacity: 1;
         transform: translate3d(0, 0, 0);
