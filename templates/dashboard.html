@@ -25,6 +25,14 @@ and show em how it's done?</p>
 <a href="/reverseTriviagame">
     <button id="reverse" class="btn btn-lg">Mirrored mode</button>
 </a>
-<p class="center">Personal best: {{ highscore }}</p>
+<p>
+    <table id="pb">
+        <tr>
+            <td>Personal best: {{ highscore }}</td>
+            <td>Personal best: {{ highscore_mirror }}</td>
+        </tr>
+    </table>
+
+</p>
 
 {% endblock %}

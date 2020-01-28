@@ -6,13 +6,14 @@
 
 {% block css %}
 <link href="/static/css/fireworks.css" rel="stylesheet">
+<link href="/static/css/index_style.css" rel="stylesheet">
 {% endblock %}
 
 {% block main %}
 <h1 class="center title">GAME OVER</h1>
 <p  class="center">(you gonna cry?)</p>
 <div class="mx-auto">
-    <a href="/triviagame">
+    <a href="{{ mode }}">
         <button class="btn btn-lg">Try again</button>
     </a>
     <a href="/">

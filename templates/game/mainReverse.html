@@ -8,54 +8,98 @@
 <link href="/static/css/game_style.css" rel="stylesheet">
 <link href="/static/css/page_transition.css" rel="stylesheet">
 <script src="https://cdn.rawgit.com/kimmobrunfeldt/progressbar.js/0.5.6/dist/progressbar.js"></script>
-<script>
-    window.onload = function onLoad() {
-        var circle = new ProgressBar.Circle('#bar', {
-            color: "#fecb4c",
-            strokeWidth: 6,
-            duration: "{{duration|tojson}}",
-            easing: 'easeInOut'
-        });
-    circle.animate(1);
-    };
-
-    window.setTimeout('refreshPage()', "{{ duration }}");
-        function refreshPage()
-
-        {
-            window.location = window.location.pathname;
-        }
-</script>
 {% endblock %}
 
 {% block main %}
-
 <div class="wrapper">
     <img src="/static/images/alarm_clock.png" />
     <div id="bar"></div>
 </div>
 
-{% for live in range(lives) %}
-<img src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
-{% endfor %}
-{% for lost_lives in range(4 - lives) %}
-<img src="static/images/broken_hearth.png" alt="broken_hearth" class="float-left hearth" width=50px height=50px>
-{% endfor %}
+<div id="hearts" class="fadein">
+    <img id="heart3" src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
+    <img id="heart2" src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
+    <img id="heart1" src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
+    <img id="heart0" src="static/images/hearth.png" alt="hearth" class="float-left hearth" width=50px height=50px>
+</div>
+
 <p id="score">{{ score }}</p>
 
 <div id="reverse">
-    <div class="reverse_transition_block">
+    <div id="transition" class="transition_block">
         <p id="question">{{ question | safe }}</p>
 
         <!-- Answers -->
-        <form name="answer" method="post" action="/reverseTriviagame">
-            <div class="btn-group-vertical" style="text-align:left">
-                {% for answer in answers %}
-                <button type="submit" name="answer" value="{{ answer }}" class="btn answer">{{ answer | safe }}</button>
-                {% endfor %}
-            </div>
-        </form>
-        <p class="center">To skip a question reload the page.</p>
+    <div id="answers" class="btn-group-vertical" style="text-align:left">
+        {% for answer in answers %}
+            <button type="submit" name="answer" value="{{ answer }}" class="btn answer">{{ answer | safe }}</button>
+        {% endfor %}
+    </div>
+    <p class="center">Reloading the page ends the game</p>
     </div>
 </div>
+<noscript>Your browser needs to support javascript in order for our site to work!</noscript>
+<script>
+    function new_question(input) {
+        $("#transition").addClass('transition_block_away');
+        answers = $.post("/reverseTriviagame", {answer: input}).done(function(data) {
+            window.clearTimeout(time);
+            timer(data.duration);
+
+            document.getElementById("bar").innerHTML = "";
+
+            if (data == false) {
+                window.clearTimeout(time);
+                window.location.href = "/reverse_game_over";
+            }
+            else {
+                let i;
+                for (i = 0; i < (4 - data.lives); i++) {
+                    $("#heart" + i).addClass('fadein');
+                    $("#heart" + i).attr("src", "static/images/broken_hearth.png");
+                    $("#heart" + i).attr("alt", "broken_hearth");
+                }
+                if (data.score % 10 == 0) {
+                    if (data.lives < 5) {
+                        id = 4 - data.lives;
+                        $("#heart" + id).removeClass("fadein");
+                        $("#heart" + id).addClass("fadein");
+                        $("#heart" + id).attr("src", "static/images/hearth.png");
+                        $("#heart" + id).attr("alt", "hearth");
+                    }
+                }
+
+                document.getElementById("score").innerHTML = data.score;
+                document.getElementById("question").innerHTML = data.question;
+                document.getElementById("answers").innerHTML = "";
+                for (i = 0; i < data.answers.length; i++) {
+                    document.getElementById("answers").innerHTML += "<button type='submit' name='answer' value='" + data.answers[i] + "' class='btn answer'>" + data.answers[i] + "</button>";
+                }
+                $("#transition").removeClass('transition_block_away');
+                $("#transition").addClass('transistion_block');
+
+                circle = new ProgressBar.Circle('#bar', {
+                    color: "#fecb4c",
+                    strokeWidth: 6,
+                    duration: data.duration,
+                    easing: 'easeInOut'
+                });
+                circle.animate(1);
+            }
+        });
+    }
+
+    var time;
+    function timer(duration) {
+        time = window.setTimeout(function() {
+            new_question("Tijd is om");
+            timer(duration);
+        }, duration);
+    }
+
+    $(document).on('click', 'button', function () {
+        var answer = $(this).val();
+        new_question(answer);
+    });
+</script>
 {% endblock %}

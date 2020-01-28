@@ -15,7 +15,8 @@
     </p>
     <a href="/add_friend"><button type="button" class="btn btn-lg">Add friend</button></a>
     <a href="/delete_friend"><button type="submit" class="btn btn-lg">Delete friend</button></a>
-    <a href="/friends_mirror"><button class="btn btn-lg" style="width:30%">Leaderboard Mirror mode</button></a>
+    <a href="/friends"><button class="btn btn-lg" style="width:30%">Leaderboard Normal mode</button></a>
+
     </br>
     </br>
     <table id=table class="table table-dark" style="width:100%">
@@ -28,13 +29,13 @@
         <tr>
             <td><strong>You</strong></td>
             <td><strong>{{ yourscore.date }}</strong></td>
-            <td><strong>{{ yourscore.highscore }}</strong></td>
+            <td><strong>{{ yourscore.highscore_mirror }}</strong></td>
         </tr>
     {% for highscore in highscores %}
         <tr>
             <td>{{ highscore.username }}</td>
             <td>{{ highscore.date }}</td>
-            <td>{{ highscore.highscore }}</td>
+            <td>{{ highscore.highscore_mirror }}</td>
         </tr>
     {% endfor %}
     </table>

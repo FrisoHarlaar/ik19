@@ -14,17 +14,45 @@
     }
 }
 
-.reverse_transition_block{
-    animation: reverseTransition 1s;
+.transition_block_away{
+    animation: transition_away 1s;
 }
 
-@keyframes reverseTransition{
+@keyframes transition_away{
     from{
-        opacity: 0;
-        transform: translate3d(-100%, 0, 0);
-    }
-    to{
         opacity: 1;
         transform: translate3d(0, 0, 0);
     }
+    to{
+        opacity: 0;
+        transform: translate3d(-100%, 0, 0);
+    }
+}
+
+.fadein {
+    animation: fadein 2s;
+
+    /* http://jsfiddle.net/SO_AMK/VV2ek/ */
+    -moz-animation: fadein 2s; /* Firefox */
+    -webkit-animation: fadein 2s; /* Safari and Chrome */
+    -o-animation: fadein 2s; /* Opera */
+}
+
+.fadeout {
+     animation: fadeout 2s;
+
+    -moz-animation: fadeout 2s; /* Firefox */
+    -webkit-animation: fadeout 2s; /* Safari and Chrome */
+    -o-animation: fadeout 2s; /* Opera */
+}
+
+
+@keyframes fadein {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeout {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }

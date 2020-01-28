@@ -4,28 +4,34 @@
     Leaderboard Mirror mode
 {% endblock %}
 
+{% block css %}
+<link href="/static/css/index_style.css" rel="stylesheet">
+<link href="/static/css/leaderboard.css" rel="stylesheet">
+{% endblock %}
+
 {% block main %}
     <p>
         <br>
         <br>
     </p>
-    <a href="/leaderboard" class="button">Leaderboard Normal mode</a>
+    <a href="/leaderboard"><button class="btn btn-lg" style="width:30%">Leaderboard Normal mode</button></a>
     <p>
         <br>
         <br>
     </p>
     <table id=table class="table table-dark" style="width:100%">
-        <link href="/static/css/leaderboard.css" rel="stylesheet">
         <tr>
-            <th id="reverseTitle" colspan="3">Leaderboard Mirror mode</th>
+            <th id="reverseTitle" colspan="4">Leaderboard Mirror mode</th>
         </tr>
         <tr>
+            <th>Rank</th>
             <th>Name</th>
             <th>Date</th>
             <th>Score</th>
         </tr>
-    {% for highscore in highscores %}
         <tr>
+    {% for (rank, highscore) in highscores %}
+            <td>#{{ rank }}</td>
             <td>{{ highscore.username }}</td>
             <td>{{ highscore.date }}</td>
             <td>{{ highscore.highscore_mirror }}</td>
