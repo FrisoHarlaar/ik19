@@ -36,11 +36,11 @@ def dashboard():
     session["timer"] = False
 
     # Query database for userdata
-    rows = get_db(["username", "highscore"], "users", "id", session["user_id"])
+    rows = get_db(["username", "highscore", "highscore_mirror"], "users", "id", session["user_id"])
 
     # Take the username and highscore
-    username, highscore = rows[0]["username"], rows[0]["highscore"]
-    return render_template("dashboard.html", username=username, highscore=highscore)
+    username, highscore, highscore_mirror = rows[0]["username"], rows[0]["highscore"], rows[0]["highscore_mirror"]
+    return render_template("dashboard.html", username=username, highscore=highscore, highscore_mirror=highscore_mirror)
 
 
 @app.route("/index")
@@ -128,7 +128,7 @@ def register():
 
         # hash password and insert data into database
         hashed_password = generate_password_hash(form["password"])
-        available = db.execute("INSERT INTO users (username, hash, highscore) VALUES (:username, :password, :hs)",
+        available = db.execute("INSERT INTO users (username, hash, highscore, highscore_mirror) VALUES (:username, :password, :hs, :hs)",
                             username=form["username"], password=hashed_password, hs=0)
 
         # Give error if username is not available
@@ -174,9 +174,12 @@ def logout():
 @app.route("/leaderboard")
 def leaderboard():
     "Show the leaderboard of the 50 best players"
+    # Get highscores in database
     highscores = db.execute("SELECT * FROM users ORDER BY highscore DESC, date;")
+    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
+    # Only 50 best players on leaderboard
     if len(highscores) > 50:
-        highscores = [highscores[i] for i in range(50)]
+        highscores = [(i, highscores[i]) for i in range(1, 51)]
 
     return render_template("game/leaderboard.html", highscores=highscores)
 
@@ -503,7 +506,7 @@ def reverse_question_setup():
     session["score"] += 1
 
     # The player gains a life and the time window shrinks after 10 questions.
-    if session["duration"] >= 10000 and session["score"] % 30 == 0 and session["score"] != 0:
+    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
@@ -521,12 +524,23 @@ def reverse_game_over():
     session["timer"] = False
 
     # get users highscore
-    highscore = db.execute("SELECT highscore FROM users WHERE id=:id", id=session["user_id"])
-    highscore = highscore[0]["highscore"]
+    highscore = db.execute("SELECT highscore_mirror FROM users WHERE id=:id", id=session["user_id"])
+    highscore = highscore[0]["highscore_mirror"]
 
     # show new record screen if current score exceeds highscore
     if session["score"] > highscore:
-        db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
+        db.execute("UPDATE users SET highscore_mirror = :score, date = CURRENT_DATE WHERE id = :user_id",
                     user_id=session["user_id"], score=session["score"])
         return render_template("game/newrecord.html", score=session["score"])
     return render_template("game/game_over.html")
+
+
+@app.route("/leaderboard_mirror")
+def leaderboard_mirror():
+    "Show the leaderboard of the 50 best players in Mirror mode"
+    highscores = db.execute("SELECT * FROM users ORDER BY highscore_mirror DESC, date;")
+    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
+    if len(highscores) > 50:
+        highscores = [(i+1, highscores[i]) for i in range(50)]
+
+    return render_template("game/leaderboard_mirror.html", highscores=highscores)
