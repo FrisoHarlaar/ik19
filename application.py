@@ -181,6 +181,17 @@ def leaderboard():
     return render_template("game/leaderboard.html", highscores=highscores)
 
 
+@app.route("/leaderboard_mirror")
+def leaderboard_mirror():
+    "Show the leaderboard of the 50 best players in Mirror mode"
+    highscores = get_db(["*"], "users", None, None, ["highscore_mirror DESC", "date"])
+    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
+    if len(highscores) > 50:
+        highscores = [(i+1, highscores[i]) for i in range(50)]
+
+    return render_template("game/leaderboard_mirror.html", highscores=highscores)
+
+
 @app.route("/friends", methods=["GET"])
 @login_required
 def friends():
@@ -418,8 +429,6 @@ def triviagame():
         return redirect("/game_over")
 
 
-
-
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
@@ -441,6 +450,7 @@ def game_over():
 @app.route("/reverseTriviagame", methods=["GET", "POST"])
 @login_required
 def reverseTriviagame():
+
     # When the user first starts up the game.
     if request.method == "GET" and session["timer"] == False:
 
@@ -471,35 +481,13 @@ def reverseTriviagame():
             # If the user is out of lives it's game over.
             if session["lives"] <= 0:
                 return jsonify(False)
-
-        return reverse_question_setup()
+        session["score"] += 1
+        return setup()
 
     # Activates when the timer runs out.
     else:
         return redirect("/reverse_game_over")
 
-
-def reverse_question_setup():
-
-    # Returns the required data for the question.
-    if session["score"] <= 10:
-        data = new_question("easy")
-    elif session["score"] <= 20:
-        data = new_question("medium")
-    else:
-        data = new_question("hard")
-
-    # Takes the question and answers from the data
-    session["correct_answer"] = data["correct_answer"]
-    session["score"] += 1
-
-    # The player gains a life and the time window shrinks after 10 questions.
-    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
-        session["duration"] -= 5000
-        if session["lives"] < 4:
-            session["lives"] += 1
-
-    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
 @app.route("/reverse_game_over", methods=["GET", "POST"])
 @login_required
@@ -519,12 +507,3 @@ def reverse_game_over():
     return render_template("game/game_over.html", mode="/reverseTriviagame")
 
 
-@app.route("/leaderboard_mirror")
-def leaderboard_mirror():
-    "Show the leaderboard of the 50 best players in Mirror mode"
-    highscores = get_db(["*"], "users", None, None, ["highscore_mirror DESC", "date"])
-    highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
-    if len(highscores) > 50:
-        highscores = [(i+1, highscores[i]) for i in range(50)]
-
-    return render_template("game/leaderboard_mirror.html", highscores=highscores)
