@@ -393,7 +393,7 @@ def change_username():
     # Set new username in database
     update_db("username", session["user_id"], new_username)
 
-    return render_template("index.html")
+    return render_template("dashboard.html")
 
 
 @app.route("/change_password", methods=["GET", "POST"])
@@ -428,7 +428,7 @@ def change_password():
     hash = generate_password_hash(form["new password"])
     update_db("hash", session["user_id"], hash)
 
-    return render_template("index.html")
+    return render_template("dashboard.html")
 
 
 @app.route("/check_changepass", methods=["POST"])
