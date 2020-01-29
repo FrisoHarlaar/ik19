@@ -1,5 +1,5 @@
 .transition_block{
-    animation: transition 1s;
+    animation: transition 1.5s;
 }
 
 
@@ -15,7 +15,7 @@
 }
 
 .transition_block_away{
-    animation: transition_away 1s;
+    animation: transition_away 1.5s;
 }
 
 @keyframes transition_away{

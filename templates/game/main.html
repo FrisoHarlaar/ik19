@@ -8,6 +8,7 @@
 <link href="/static/css/game_style.css" rel="stylesheet">
 <link href="/static/css/page_transition.css" rel="stylesheet">
 <script src="https://cdn.rawgit.com/kimmobrunfeldt/progressbar.js/0.5.6/dist/progressbar.js"></script>
+<script src="{{ url_for('static', filename='javascript/game.js') }}"></script>
 {% endblock %}
 
 {% block main %}
@@ -37,76 +38,7 @@
 </div>
 <noscript>Your browser needs to support javascript in order for our site to work!</noscript>
 <script>
-
-    function new_question(input) {
-        if (input == 'setup') {
-            $("#transition").addClass('transition_block');
-        }
-        else {
-            $("#transition").addClass('transition_block_away');
-        }
-        answers = $.post("/triviagame", {answer: input}, function(data) {
-            window.clearTimeout(time);
-            timer(data.duration);
-
-            document.getElementById("bar").innerHTML = "";
-            if (data.load == true) {
-                circle = new ProgressBar.Circle('#bar', {
-                    color: "#fecb4c",
-                    strokeWidth: 6,
-                    duration: data.duration + 2000,
-                    easing: 'easeInOut'
-                });
-                circle.animate(1);
-            }
-            else if (data == false) {
-                window.clearTimeout(time);
-                window.location.href = "/game_over";
-            }
-            else {
-                let i;
-                for (i = 0; i < (4 - data.lives); i++) {
-                    $("#heart" + i).addClass('fadein');
-                    $("#heart" + i).attr("src", "static/images/broken_hearth.png");
-                    $("#heart" + i).attr("alt", "broken_hearth");
-                }
-                if (data.score % 10 == 0) {
-                    if (data.lives < 5) {
-                        id = 4 - data.lives;
-                        $("#heart" + id).removeClass("fadein");
-                        $("#heart" + id).addClass("fadein");
-                        $("#heart" + id).attr("src", "static/images/hearth.png");
-                        $("#heart" + id).attr("alt", "hearth");
-                    }
-                }
-
-                document.getElementById("score").innerHTML = data.score;
-                document.getElementById("question").innerHTML = data.question;
-                document.getElementById("answers").innerHTML = "";
-                for (i = 0; i < data.answers.length; i++) {
-                    document.getElementById("answers").innerHTML += "<button type='submit' name='answer' value='" + data.answers[i] + "' class='btn answer'>" + data.answers[i] + "</button>";
-                }
-                $("#transition").removeClass('transition_block_away');
-                $("#transition").addClass('transition_block');
-
-                circle = new ProgressBar.Circle('#bar', {
-                    color: "#fecb4c",
-                    strokeWidth: 6,
-                    duration: data.duration + 2000,
-                    easing: 'easeInOut'
-                });
-                circle.animate(1);
-            }
-        });
-    }
-    var time;
-    function timer(duration) {
-        time = window.setTimeout(function() {
-            new_question("Tijd is om");
-            timer(duration);
-        }, duration);
-    }
-
+    // when button is clicked submit answer and get next question
     $(document).on('click', 'button', function () {
         var answer = $(this).val();
         new_question(answer);

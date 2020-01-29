@@ -32,9 +32,8 @@ Session(app)
 # The index page.
 @app.route("/")
 @login_required
-
-# This is the main page where the user can pick a game mode.
 def dashboard():
+    """Home page"""
 
     # This is variable checks what game mode the player wants to play.
     # It's default value is set to false here.
@@ -53,18 +52,16 @@ def dashboard():
 
 
 @app.route("/index")
-
-# Redirect to the index page if not logged in.
 def index():
+    """Default page when not logged in"""
 
     # Loads the index page.
     return render_template("index.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
-
-# This function allows the user to log in.
 def login():
+    """Login user"""
 
     # Forget any user_id.
     session.clear()
@@ -99,9 +96,8 @@ def login():
 
 
 @app.route("/check_login", methods=["POST"])
-
-# This function gives feedback to the user when logging in.
 def check_login():
+    """Give feedback to user when logging in"""
 
     # Grabs the user inputs.
     username = request.form.get("username")
@@ -110,7 +106,7 @@ def check_login():
     # look for username in database
     rows = get_db(["*"], "users", "username", username)
 
-    # check if username exists and if password is correct
+    # check if username exists and if password is correct.
     if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
         return jsonify(False)
     else:
@@ -118,9 +114,8 @@ def check_login():
 
 
 @app.route("/register", methods=["GET", "POST"])
-
-# This function allows the user to register.
 def register():
+    """Register user"""
 
     # User reached route via POST.
     if request.method == "POST":
@@ -163,9 +158,8 @@ def register():
 
 
 @app.route("/check_username", methods=["GET"])
-
-# This function gives feedback to the user when registering.
 def check_username():
+    """Give feedback to user when registering"""
 
     # Get username from form.
     username = request.args.get("username")
@@ -182,25 +176,25 @@ def check_username():
 
 @app.route("/logout")
 @login_required
-
-# This function allows the user to log out.
 def logout():
+    """Logout user"""
 
-    # clear session
+    # clear session.
     session.clear()
 
-    # return to homescreen
+    # return to homescreen.
     return redirect("/")
 
 
 @app.route("/leaderboard")
-
-# This function renders the main leaderboard.
 def leaderboard():
-    # Show the leaderboard of the 50 best players
+    """Show leaderboard"""
+
+    # Show the leaderboard of the 50 best players.
     highscores = get_db(["*"], "users", None, None, ["highscore DESC", "date"])
     highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
-    # Only 50 best players on leaderboard
+
+    # if there's more than 50 users, show only top 50
     if len(highscores) > 50:
         highscores = [(i, highscores[i]) for i in range(1, 51)]
 
@@ -208,12 +202,14 @@ def leaderboard():
 
 
 @app.route("/leaderboard_mirror")
-
-# This function renders the mirrored leaderboard.
 def leaderboard_mirror():
-    "Show the leaderboard of the 50 best players in Mirror mode"
+    """Show mirrored leaderboard"""
+
+    # Show the leaderboard of the 50 best players in Mirror mode
     highscores = get_db(["*"], "users", None, None, ["highscore_mirror DESC", "date"])
     highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
+
+    # if there's more than 50 users, show only top 50
     if len(highscores) > 50:
         highscores = [(i+1, highscores[i]) for i in range(50)]
 
@@ -222,10 +218,8 @@ def leaderboard_mirror():
 
 @app.route("/friends", methods=["GET"])
 @login_required
-
-# This function allows the user to add and delete friends.
-# It also allows users to see their friend's highscores.
 def friends():
+    """Show friends scores"""
 
     # get current users friends.
     friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
@@ -243,9 +237,8 @@ def friends():
 
 @app.route("/friends_mirror", methods=["GET"])
 @login_required
-
-# Does the same as the above, but shows mirrored scored instead.
 def friends_mirror():
+    """Show friends mirrored scores"""
 
     # get current users friends.
     friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
@@ -263,9 +256,8 @@ def friends_mirror():
 
 @app.route("/delete_friend", methods=["GET", "POST"])
 @login_required
-
-# Allows the user to delete a friend.
 def delete_friend():
+    """Allow the user to delete a friend"""
 
     # User reached route via POST.
     if request.method == "POST":
@@ -287,39 +279,39 @@ def delete_friend():
 
 @app.route("/add_friend", methods=["GET", "POST"])
 @login_required
-
-# Allows the user to add a friend.
 def add_friend():
+    """Allow the user to add a friend"""
 
-    # User reached route via POST.
-    if request.method == "POST":
-
-        # Gets the filled in name and looks it up in the database.
-        friendname = request.form.get("friendname")
-        friend = get_db(["username"], "users", "username", friendname)
-
-        # If the friend isn't found in the database, return an error.
-        if not friend:
-            return render_template("apology.html", message="Username does not exist!", code=400)
-        friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
-
-        # If the user is already friends with this person, return an error.
-        if friends:
-            return render_template("apology.html", message="You already have this friend", code=400)
-
-        # Else add the friend to the users friends list.
-        insdel_db("ins_friends", session["user_id"], friendname)
-        return redirect("/friends")
-
-    # Render the html page before POSTing.
-    else:
+    # User reached route via GET.
+    if request.method == "GET":
         return render_template("friends/add_friend.html")
+
+    # get friendname.
+    friendname = request.form.get("friendname")
+
+    # check if friend exists in user tabel.
+    friend = get_db(["username"], "users", "username", friendname)
+
+    # return apology if friend doesn't exist.
+    if not friend:
+        return render_template("apology.html", message="Username does not exist!", code=400)
+
+    # check if friend is already current users friend.
+    friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
+
+    # return apology if user already has this friend.
+    if friends:
+        return render_template("apology.html", message="You already have this friend", code=400)
+
+    # insert friend into friends tabel.
+    insdel_db("ins_friends", session["user_id"], friendname)
+    return redirect("/friends")
 
 
 @app.route("/check_friend", methods=["POST"])
-
-# Gives feedback to the user when adding a friend.
+@login_required
 def check_friend():
+    """Give feedback to user when adding a friend"""
 
     # get friendname and user id
     friendname = request.form.get("friendname")
@@ -343,9 +335,12 @@ def check_friend():
     else:
         return jsonify(True, True)
 
+
 @app.route("/profile", methods=["GET"])
 @login_required
 def profile():
+    """Profile page user"""
+
     # Query database for user
     profiles = get_db(["username", "highscore"], "users", "id", session["user_id"])
 
@@ -354,7 +349,10 @@ def profile():
         username = profile["username"]
         highscore = profile["highscore"]
 
+    # Get all users and their highscore
     users = get_db(["id"], "users", None, None, ["highscore DESC, date"])
+
+    # Get current users rank
     rank = 0
     for user in users:
         rank += 1
@@ -368,69 +366,66 @@ def profile():
 @login_required
 def change_username():
     """Change username user"""
+
     # User reached route via "GET"
     if request.method == "GET":
         return render_template("auth/change_username.html")
 
-    # User reached route via POST
-    else:
+    # Assign form input to local dict
+    new_username = request.form.get("new username")
 
-        # Assign form input to local dict
-        new_username = request.form.get("new username")
+    # Ensure form was fully filled out
+    if new_username == '':
+        return render_template("apology.html", message="must provide username", code=400)
 
-        # Ensure form was fully filled out
-        if new_username == '':
-            return render_template("apology.html", message="must provide username", code=400)
+    # Ensure new username does not already exists
+    if get_db(["username"], "users", "username", new_username):
+        return render_template("apology.html", message="new username not available", code=400)
 
-        # Ensure new username does not already exists
-        if get_db(["username"], "users", "username", new_username):
-            return render_template("apology.html", message="new username not available", code=400)
+    # Set new username in database
+    update_db("username", session["user_id"], new_username)
 
-        # Set new username in database
-        update_db("username", session["user_id"], new_username)
-
-        return render_template("index.html")
+    return render_template("index.html")
 
 
 @app.route("/change_password", methods=["GET", "POST"])
 @login_required
 def change_password():
     """Change password user"""
-    # User reached route via "GET"
+
+    # User reached route via "GET".
     if request.method == "GET":
         return render_template("auth/change_password.html")
 
-    # User reached route via POST
-    else:
+    # Assign form input to local dict.
+    form = {"password": request.form.get("password"),
+            "new password": request.form.get("new password"),
+            "password confirmation": request.form.get("password confirmation")}
 
-        # Assign form input to local dict
-        form = {"password": request.form.get("password"),
-                "new password": request.form.get("new password"),
-                "password confirmation": request.form.get("password confirmation")}
+    # Ensure form was fully filled out.
+    for form_item in form.items():
+        if form_item[1] == '':
+            message = "must provide " + form_item[0]
+            return render_template("apology.html", message=message, code=400)
 
-        # Ensure form was fully filled out
-        for form_item in form.items():
-            if form_item[1] == '':
-                message = "must provide " + form_item[0]
-                return render_template("apology.html", message=message, code=400)
+    # Ensure old password and new password are not the same.
+    if form["password"] == form["new password"]:
+        return render_template("apology.html", message="old password and new password can't be the same", code=400)
 
-        # Ensure old password and new password are not the same
-        if form["password"] == form["new password"]:
-            return render_template("apology.html", message="old password and new password can't be the same", code=400)
+    # Ensure new password and confirmation match.
+    if form["new password"] != form["password confirmation"]:
+        return render_template("apology.html", message="new password and confirmation don't match", code=400)
 
-        # Ensure new password and confirmation match
-        if form["new password"] != form["password confirmation"]:
-            return render_template("apology.html", message="new password and confirmation don't match", code=400)
+    # Set new password in database.
+    hash = generate_password_hash(form["new password"])
+    update_db("hash", session["user_id"], hash)
 
-        # Set new password in database
-        hash = generate_password_hash(form["new password"])
-        update_db("hash", session["user_id"], hash)
-
-        return render_template("index.html")
+    return render_template("index.html")
 
 
 @app.route("/check_changepass", methods=["POST"])
 def check_changepass():
+    """Give feedback to user when changing password"""
 
     # retrieve user input and id
     old_password = request.form.get("oldpassword")
@@ -449,6 +444,8 @@ def check_changepass():
 @app.route("/triviagame", methods=["GET", "POST"])
 @login_required
 def triviagame():
+    """The trivia game itself"""
+
     # When the user first starts up the game.
     if request.method == "GET" and session["timer"] == False:
 
@@ -480,7 +477,7 @@ def triviagame():
 
         # Checks if the user answered the question correctly.
         if request.form.get("answer") == "setup":
-            return setup(True)
+            return jsonify(load=True, duration=session["duration"])
         elif request.form.get("answer") != session["correct_answer"]:
             session["lives"] -= 1
 
@@ -494,33 +491,51 @@ def triviagame():
     else:
         return redirect("/game_over")
 
+
 @app.route("/reverseTriviagame", methods=["GET", "POST"])
 @login_required
 def reverseTriviagame():
+    """Enables mirror mode"""
+
+    # The mirror variable is set to true letting the triviagame function know
+    # that the user wants to play mirrored mode.
     session["mirror"] = True
+
     return redirect("/triviagame")
 
 
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
 def game_over():
+    """Handle the game over screen"""
 
-    # stop game
+    # Reset timer value.
     session["timer"] = False
 
+    # Do this if gamemode is normal mode.
     if session["mirror"] == False:
-        # get users highscore
+
+        # get users normal mode highscore
         highscore = get_db(["highscore"], "users", "id", session["user_id"])[0]["highscore"]
-         # show new record screen if current score exceeds highscore
+
+        # Show new record screen if current score exceeds highscore.
         if session["score"] > highscore:
             update_db("highscore", session["user_id"], session["score"])
             return render_template("game/newrecord.html", score=session["score"], mode="/triviagame")
+
+        # Else show the regular game over screen.
         return render_template("game/game_over.html", mode="/triviagame")
 
     # Do the same as the above, but for mirror mode.
     else:
+
+        # Get users mirror mode highscore.
         highscore = get_db(["highscore_mirror"], "users", "id", session["user_id"])[0]["highscore_mirror"]
+
+        # Show new record screen if current score exceeds highscore
         if session["score"] > highscore:
             update_db("highscore_mirror", session["user_id"], session["score"])
             return render_template("game/newrecord.html", score=session["score"], mode="/reverseTriviagame")
+
+        # Else show the regular game over screen.
         return render_template("game/game_over.html", mode="/reverseTriviagame")
