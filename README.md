@@ -51,17 +51,9 @@ Verder hebben wij een mapje templates, met daarin alle html templates. Hierin zi
 
 Ook hebben wij een mapje static met daarin alle geluiden, afbeeldingen, css bestanden en externe javascript bestanden waarnaar verwijst wordt in de html bestanden.
 
-![Login sketch](schetsen/login.png)
+Screenshots:
+![Normal mode](screenshots/normalmode.png)
 
-![Register sketch](schetsen/register.png)
+![Morrir mode](screenshots/mirrormode.png)
 
-![index sketch](schetsen/index.png)
-
-![dashboard sketch](schetsen/dashboard.png)
-
-![game sketch](schetsen/game.png)
-
-![profile sketch](schetsen/profile.png)
-
-https://drive.google.com/open?id=1i1CcKv4qYAudbn1Wy_uRDpWVmmscqeqm
 
