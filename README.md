@@ -38,17 +38,17 @@ Helpers<br>
 In ons helpers document hebben we één functie genaamd login_required.
 Deze functie zorgt ervoor dat de gebruiker de bepaald route alleen kan doen als hij ingelogd is.
 
-![Login sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/login.png)
+![Login sketch](schetsen/login.png)
 
-![Register sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/register.png)
+![Register sketch](schetsen/register.png)
 
-![index sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/index.png)
+![index sketch](schetsen/index.png)
 
-![dashboard sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/dashboard.png)
+![dashboard sketch](schetsen/dashboard.png)
 
-![game sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/game.png)
+![game sketch](schetsen/game.png)
 
-![profile sketch](https://raw.githubusercontent.com/Svanmansom/ik19/master/Schetsen/profile.png)
+![profile sketch](schetsen/profile.png)
 
 https://drive.google.com/open?id=1i1CcKv4qYAudbn1Wy_uRDpWVmmscqeqm
 
