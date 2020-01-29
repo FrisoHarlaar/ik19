@@ -238,6 +238,7 @@ def friends():
 
     # get users highscore and date.
     yourscore = get_db(["highscore", "date"], "users", "id", session["user_id"])
+
     return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
 
 
@@ -256,7 +257,8 @@ def friends_mirror():
     highscores = sorted(highscores, key=lambda k:k["highscore_mirror"], reverse=True)
 
     # get users highscore and date.
-    yourscore = get_db(["highscore_mirror", "date"], "users", "username", session["user_id"])
+    yourscore = get_db(["highscore_mirror", "date"], "users", "id", session["user_id"])
+
     return render_template("friends/friends_mirror.html", highscores=highscores, yourscore=yourscore[0])
 
 
