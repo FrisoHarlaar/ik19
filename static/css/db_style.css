@@ -1,3 +1,8 @@
+/*
+    * File: db_style.css
+    * Use: provides styling for the dashboard page
+*/
+
 #dbtext
 {
     text-align: left;
@@ -35,4 +40,9 @@
 td {
   padding: 0px 70px;
   vertical-align: top;
+}
+
+footer
+{
+    margin-top: 10%;
 }

@@ -1,3 +1,8 @@
+"""
+* File: helpers.py
+* Use: provides extra functions for application.py
+"""
+
 import os, urllib.request, json, urllib.parse, requests, random
 from flask import redirect, render_template, request, session, jsonify
 from functools import wraps
