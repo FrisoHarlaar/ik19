@@ -6,7 +6,7 @@
 
 {% block main %}
     <table id=table style="width:75%">
-        <link href="/static/css/profile.css" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/profile.css') }}" rel="stylesheet">
         <tr>
             <th>Username</th>
             <td>{{ username }}</td>

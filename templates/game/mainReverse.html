@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block css %}
-<link href="/static/css/game_style.css" rel="stylesheet">
-<link href="/static/css/page_transition.css" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/game_style.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/page_transition.css') }}" rel="stylesheet">
 <script src="https://cdn.rawgit.com/kimmobrunfeldt/progressbar.js/0.5.6/dist/progressbar.js"></script>
 <script src="{{ url_for('static', filename='javascript/game.js') }}"></script>
 {% endblock %}
@@ -31,15 +31,17 @@
         <p id="question">{{ question | safe }}</p>
 
         <!-- Answers -->
-    <div id="answers" class="btn-group-vertical" style="text-align:left">
-        {% for answer in answers %}
-            <button type="submit" name="answer" value="{{ answer }}" class="btn answer">{{ answer | safe }}</button>
-        {% endfor %}
-    </div>
-    <p class="center">Reloading the page ends the game</p>
+        <div id="answers" class="btn-group-vertical" style="text-align:left">
+            {% for answer in answers %}
+                <button type="submit" name="answer" value="{{ answer }}" class="btn answer">{{ answer | safe }}</button>
+            {% endfor %}
+        </div>
+        <p class="center">Reloading the page ends the game</p>
     </div>
 </div>
+
 <noscript>Your browser needs to support javascript in order for our site to work!</noscript>
+
 <script>
     // when button is clicked submit answer and get next question
     $(document).on('click', 'button', function () {
