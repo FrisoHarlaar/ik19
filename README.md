@@ -28,6 +28,7 @@ Door: Sven van Mansom, Richard van den Aardweg en Friso Harlaar<br>
 
 ## Rolverdeling
 ### Sven:
+Vooral gewerkt aan het triviaspel, dashboard en de index paginas/functies. Ook verantwoordelijk geweest voor grote delen van de styling en het design van de site.
 
 ### Richard:
 Vooral gewerkt aan de leaderboards, profile en Mirror mode. Ook ervoor gezorgd dat de gebruikers hun gebruikersnaam en wachtwoord kunnen veranderen.
