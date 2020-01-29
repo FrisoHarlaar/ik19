@@ -1,4 +1,4 @@
-function new_question(input, mode="") {
+function new_question(input) {
     // when page loads
     if (input == 'setup') {
         $("#transition").addClass('transition_block');
@@ -10,7 +10,7 @@ function new_question(input, mode="") {
     }
 
     // send post request to server
-    $.post("/" + mode + "triviagame", {answer: input}, function(data) {
+    $.post("/triviagame", {answer: input}, function(data) {
         // reset timer
         window.clearTimeout(time);
         timer(data.duration);
