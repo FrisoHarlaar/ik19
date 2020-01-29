@@ -33,6 +33,7 @@ Session(app)
 @app.route("/")
 @login_required
 def dashboard():
+    session["mirror"] = False
     session["timer"] = False
 
     # Query database for userdata
@@ -396,7 +397,9 @@ def triviagame():
 
         # Clears the session (except for the user ID) so the user can start a new game.
         user_id = session["user_id"]
+        mirror = session["mirror"]
         session.clear()
+        session["mirror"] = mirror
         session["user_id"] = user_id
 
         # Returns the required data for the question.
@@ -408,6 +411,10 @@ def triviagame():
         session["score"] = 0
         session["timer"] = True
         session["duration"] = 30000
+
+        if session["mirror"] == True:
+            return render_template("game/mainReverse.html",
+            lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
         return render_template("game/main.html",
         lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
@@ -430,6 +437,12 @@ def triviagame():
     else:
         return redirect("/game_over")
 
+@app.route("/reverseTriviagame", methods=["GET", "POST"])
+@login_required
+def reverseTriviagame():
+    session["mirror"] = True
+    return redirect("/triviagame")
+
 
 @app.route("/game_over", methods=["GET", "POST"])
 @login_required
@@ -438,74 +451,19 @@ def game_over():
     # stop game
     session["timer"] = False
 
-    # get users highscore
-    highscore = get_db(["highscore"], "users", "id", session["user_id"])
-    highscore = highscore[0]["highscore"]
+    if session["mirror"] == False:
+        # get users highscore
+        highscore = get_db(["highscore"], "users", "id", session["user_id"])[0]["highscore"]
+         # show new record screen if current score exceeds highscore
+        if session["score"] > highscore:
+            update_db("highscore", session["user_id"], session["score"])
+            return render_template("game/newrecord.html", score=session["score"], mode="/triviagame")
+        return render_template("game/game_over.html", mode="/triviagame")
 
-    # show new record screen if current score exceeds highscore
-    if session["score"] > highscore:
-        update_db("highscore", session["user_id"], session["score"])
-        return render_template("game/newrecord.html", score=session["score"])
-    return render_template("game/game_over.html", mode="/triviagame")
-
-
-@app.route("/reverseTriviagame", methods=["GET", "POST"])
-@login_required
-def reverseTriviagame():
-
-    # When the user first starts up the game.
-    if request.method == "GET" and session["timer"] == False:
-
-        # Clears the session (except for the user ID) so the user can start a new game.
-        user_id = session["user_id"]
-        session.clear()
-        session["user_id"] = user_id
-
-        # Returns the required data for the question.
-        data = new_question("easy")
-
-        # Set standard variables for the start of the game.
-        session["correct_answer"] = data["correct_answer"]
-        session["lives"] = 4
-        session["score"] = 0
-        session["timer"] = True
-        session["duration"] = 50000
-        return render_template("game/mainReverse.html",
-        lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
-
-    # After answering the first answer.
-    if request.method == "POST":
-
-        # Checks if the user answered the question correctly.
-        if request.form['answer'] != session["correct_answer"]:
-            session["lives"] -= 1
-
-            # If the user is out of lives it's game over.
-            if session["lives"] <= 0:
-                return jsonify(False)
-        session["score"] += 1
-        return setup()
-
-    # Activates when the timer runs out.
+    # Do the same as the above, but for mirror mode.
     else:
-        return redirect("/reverse_game_over")
-
-
-@app.route("/reverse_game_over", methods=["GET", "POST"])
-@login_required
-def reverse_game_over():
-
-    # stop game
-    session["timer"] = False
-
-    # get users highscore
-    highscore = get_db(["highscore_mirror"], "users", "id", session["user_id"])
-    highscore = highscore[0]["highscore_mirror"]
-
-    # show new record screen if current score exceeds highscore
-    if session["score"] > highscore:
-        update_db("highscore_mirror", session["user_id"], session["score"])
-        return render_template("game/newrecord.html", score=session["score"])
-    return render_template("game/game_over.html", mode="/reverseTriviagame")
-
-
+        highscore = get_db(["highscore_mirror"], "users", "id", session["user_id"])[0]["highscore_mirror"]
+        if session["score"] > highscore:
+            update_db("highscore_mirror", session["user_id"], session["score"])
+            return render_template("game/newrecord.html", score=session["score"], mode="/reverseTriviagame")
+        return render_template("game/game_over.html", mode="/reverseTriviagame")
