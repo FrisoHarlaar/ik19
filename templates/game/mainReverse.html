@@ -48,7 +48,7 @@
         else {
             $("#transition").addClass('transition_block_away');
         }
-        answers = $.post("/reverseTriviagame", {answer: input}, function(data) {
+        answers = $.post("/triviagame", {answer: input}, function(data) {
             window.clearTimeout(time);
             timer(data.duration);
 
