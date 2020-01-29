@@ -39,7 +39,7 @@
 <script>
     function new_question(input) {
         $("#transition").addClass('transition_block_away');
-        answers = $.post("/triviagame", {answer: input}).done(function(data) {
+        answers = $.post("/triviagame", {answer: input}, function(data) {
             window.clearTimeout(time);
             timer(data.duration);
 
@@ -78,7 +78,7 @@
                 circle = new ProgressBar.Circle('#bar', {
                     color: "#fecb4c",
                     strokeWidth: 6,
-                    duration: data.duration,
+                    duration: data.duration + 2000,
                     easing: 'easeInOut'
                 });
                 circle.animate(1);
@@ -86,7 +86,6 @@
         });
     }
 
-    var time;
     function timer(duration) {
         time = window.setTimeout(function() {
             new_question("Tijd is om");

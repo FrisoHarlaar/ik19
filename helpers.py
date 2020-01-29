@@ -1,5 +1,5 @@
 import os, urllib.request, json, urllib.parse, requests, random
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, jsonify
 from functools import wraps
 from cs50 import SQL
 
@@ -32,6 +32,26 @@ def new_question(difficulty):
         data["all_answers"] = data["incorrect_answers"] + [data["correct_answer"]]
         random.shuffle(data["all_answers"])
         return data
+
+def setup():
+    # Returns the required data for the question.
+    if session["score"] <= 10:
+        data = new_question("easy")
+    elif session["score"] <= 20:
+        data = new_question("medium")
+    else:
+        data = new_question("hard")
+
+    # Takes the question and answers from the data
+    session["correct_answer"] = data["correct_answer"]
+
+    # The player gains a life and the time window shrinks after 10 questions.
+    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
+        session["duration"] -= 5000
+        if session["lives"] < 4:
+            session["lives"] += 1
+    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+
 
 # Function to easily get data from the database.
 # Items need to be a list of the requested item(s).

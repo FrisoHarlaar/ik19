@@ -3,7 +3,7 @@ from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import login_required, new_question, get_db
+from helpers import login_required, new_question, get_db, setup
 from tempfile import mkdtemp
 
 # Configure application
@@ -421,24 +421,7 @@ def triviagame():
     else:
         return redirect("/game_over")
 
-def setup():
-    # Returns the required data for the question.
-    if session["score"] <= 10:
-        data = new_question("easy")
-    elif session["score"] <= 20:
-        data = new_question("medium")
-    else:
-        data = new_question("hard")
 
-    # Takes the question and answers from the data
-    session["correct_answer"] = data["correct_answer"]
-
-    # The player gains a life and the time window shrinks after 10 questions.
-    if session["duration"] >= 10000 and session["score"] % 10 == 0 and session["score"] != 0:
-        session["duration"] -= 5000
-        if session["lives"] < 4:
-            session["lives"] += 1
-    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
 
 
 @app.route("/game_over", methods=["GET", "POST"])
