@@ -32,8 +32,16 @@ Session(app)
 # The index page.
 @app.route("/")
 @login_required
+
+# This is the main page where the user can pick a game mode.
 def dashboard():
+
+    # This is variable checks what game mode the player wants to play.
+    # It's default value is set to false here.
     session["mirror"] = False
+
+    # This variable stops the user from refreshing the page on the first question.
+    # It gets set to true when the game is started.
     session["timer"] = False
 
     # Query database for userdata
@@ -45,48 +53,57 @@ def dashboard():
 
 
 @app.route("/index")
+
+# Redirect to the index page if not logged in.
 def index():
+
+    # Loads the index page.
     return render_template("index.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
+
+# This function allows the user to log in.
 def login():
-    """Log user in"""
-    # Forget any user_id
+
+    # Forget any user_id.
     session.clear()
 
-    # User reached route via GET (as by clicking a link or via redirect)
+    # User reached route via GET (as by clicking a link or via redirect).
     if request.method == "GET":
         return render_template("auth/login.html")
 
-    # User reached route via POST (as by submitting a form via POST)
+    # User reached route via POST (as by submitting a form via POST).
     else:
-         # Assign form input to local dict
+        # Assign form input to local dict
         form = {"username": request.form.get("username"), "password": request.form.get("password")}
 
-         # Ensure form was fully filled out
+        # Ensure form was fully filled out.
         for form_item in form.items():
             if form_item[1] == '':
                 message = "must provide " + form_item[0]
                 return render_template("apology.html", message=message, code=400)
 
-        # Query database for username
+        # Query database for username.
         rows = get_db(["*"], "users", "username", form["username"])
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], form["password"]):
             return render_template("apology.html", message="invalid username and/or password", code=400)
 
-        # Remember which user has logged in
+        # Remember which user has logged in.
         session["user_id"] = rows[0]["id"]
 
-        # Redirect user to home page
+        # Redirect user to home page,
         return redirect("/")
 
 
 @app.route("/check_login", methods=["POST"])
+
+# This function gives feedback to the user when logging in.
 def check_login():
 
+    # Grabs the user inputs.
     username = request.form.get("username")
     password = request.form.get("password")
 
@@ -101,36 +118,38 @@ def check_login():
 
 
 @app.route("/register", methods=["GET", "POST"])
+
+# This function allows the user to register.
 def register():
 
-    # User reached route via POST
+    # User reached route via POST.
     if request.method == "POST":
 
-        # Assign form input to local dict
+        # Assign form input to local dict.
         form = {"username": request.form.get("username"), "password": request.form.get("password"), "confirmation": request.form.get("confirmation")}
 
-        # Ensure form was fully filled out
+        # Ensure form was fully filled out.
         for form_item in form.items():
             if form_item[1] == '':
                 message = "must provide " + form_item[0]
                 return render_template("apology.html", message=message, code=400)
 
-        # Ensure password and confirmation match
+        # Ensure password and confirmation match.
         if not form["password"] == form["confirmation"]:
             return render_template("apology.html", message="password and confirmation do not match", code=400)
 
-        # check if password contains any numbers
+        # check if password contains any numbers.
         numbers = any([char.isdigit() for char in form["password"]])
 
-        # check if password meets requirements
+        # check if password meets requirements.
         if len(form["password"]) < 6 or len(form["password"]) >= 20 or form["password"].find(" ") != -1 or not numbers:
             return render_template("apology.html", message="password does not meet the requirements", code=400)
 
-        # hash password and insert data into database
+        # hash password and insert data into database.
         hashed_password = generate_password_hash(form["password"])
         available = insdel_db("available", form["username"], hashed_password)
 
-        # Give error if username is not available
+        # Give error if username is not available.
         if not available:
             return render_template("apology.html", message="username not available", code=400)
 
@@ -138,21 +157,23 @@ def register():
 
         return redirect("/")
 
-    # User reached route via GET
+    # User reached route via GET.
     else:
         return render_template("auth/register.html")
 
 
 @app.route("/check_username", methods=["GET"])
+
+# This function gives feedback to the user when registering.
 def check_username():
 
-    # Get username from form
+    # Get username from form.
     username = request.args.get("username")
 
-    # Look for username in database
+    # Look for username in database.
     usernames = get_db(["username"], "users", "username", username)
 
-    # Check if username is in database and longer than 1 character
+    # Check if username is in database and longer than 1 character.
     if len(usernames) == 0 and len(username) > 1:
         return jsonify(True)
     else:
@@ -161,6 +182,8 @@ def check_username():
 
 @app.route("/logout")
 @login_required
+
+# This function allows the user to log out.
 def logout():
 
     # clear session
@@ -171,8 +194,10 @@ def logout():
 
 
 @app.route("/leaderboard")
+
+# This function renders the main leaderboard.
 def leaderboard():
-    "Show the leaderboard of the 50 best players"
+    # Show the leaderboard of the 50 best players
     highscores = get_db(["*"], "users", None, None, ["highscore DESC", "date"])
     highscores = [(i+1, highscores[i]) for i in range(len(highscores))]
     # Only 50 best players on leaderboard
@@ -183,6 +208,8 @@ def leaderboard():
 
 
 @app.route("/leaderboard_mirror")
+
+# This function renders the mirrored leaderboard.
 def leaderboard_mirror():
     "Show the leaderboard of the 50 best players in Mirror mode"
     highscores = get_db(["*"], "users", None, None, ["highscore_mirror DESC", "date"])
@@ -195,57 +222,64 @@ def leaderboard_mirror():
 
 @app.route("/friends", methods=["GET"])
 @login_required
+
+# This function allows the user to add and delete friends.
+# It also allows users to see their friend's highscores.
 def friends():
 
-    # get current users friends
+    # get current users friends.
     friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
 
-    # get highscores from every friend
+    # get highscores from every friend.
     highscores = sum([get_db(["username", "highscore", "date"], "users", "username", friend) for friend in friends], [])
 
-    # sort friend highscores
+    # sort friend highscores.
     highscores = sorted(highscores, key=lambda k:k["highscore"], reverse=True)
 
-    # get users highscore and date
+    # get users highscore and date.
     yourscore = get_db(["highscore", "date"], "users", "id", session["user_id"])
     return render_template("friends/friends.html", highscores=highscores, yourscore=yourscore[0])
 
 
 @app.route("/friends_mirror", methods=["GET"])
 @login_required
+
+# Does the same as the above, but shows mirrored scored instead.
 def friends_mirror():
 
-    # get current users friends
-    friends = set([friend["friendname"] for friend in db.execute("SELECT friendname FROM friends WHERE user_id= :user_id", user_id=session["user_id"])])
+    # get current users friends.
+    friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
 
-    # get highscores from every friend
-    highscores = sum([db.execute("SELECT username, highscore_mirror, date FROM users WHERE username=:username", username=friend) for friend in friends], [])
+    # get highscores from every friend.
+    highscores = sum([get_db(["username", "highscore_mirror", "date"], "users", "username", friend) for friend in friends], [])
 
-    # sort friend highscores
+    # sort friend highscores.
     highscores = sorted(highscores, key=lambda k:k["highscore_mirror"], reverse=True)
 
-    # get users highscore and date
-    yourscore = db.execute("SELECT highscore_mirror, date FROM users WHERE id=:user_id", user_id=session["user_id"])
+    # get users highscore and date.
+    yourscore = get_db(["highscore_mirror", "date"], "users", "username", session["user_id"])
     return render_template("friends/friends_mirror.html", highscores=highscores, yourscore=yourscore[0])
 
 
 @app.route("/delete_friend", methods=["GET", "POST"])
 @login_required
+
+# Allows the user to delete a friend.
 def delete_friend():
 
-    # User reached route via POST
+    # User reached route via POST.
     if request.method == "POST":
         friendname = request.form.get("friendname")
 
-        # Delete friend from database
+        # Delete friend from database.
         insdel_db("del_friends", session["user_id"], friendname)
 
         return redirect("/friends")
 
-    # User reached route via GET
+    # User reached route via GET.
     else:
 
-        # Get friends from database
+        # Get friends from database.
         friends = set([friend["friendname"] for friend in get_db(["friendname"], "friends", "user_id", session["user_id"])])
 
         return render_template("friends/delete_friend.html", friends=friends)
@@ -253,36 +287,59 @@ def delete_friend():
 
 @app.route("/add_friend", methods=["GET", "POST"])
 @login_required
+
+# Allows the user to add a friend.
 def add_friend():
+
+    # User reached route via POST.
     if request.method == "POST":
+
+        # Gets the filled in name and looks it up in the database.
         friendname = request.form.get("friendname")
         friend = get_db(["username"], "users", "username", friendname)
 
+        # If the friend isn't found in the database, return an error.
         if not friend:
             return render_template("apology.html", message="Username does not exist!", code=400)
         friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
 
+        # If the user is already friends with this person, return an error.
         if friends:
             return render_template("apology.html", message="You already have this friend", code=400)
 
+        # Else add the friend to the users friends list.
         insdel_db("ins_friends", session["user_id"], friendname)
         return redirect("/friends")
+
+    # Render the html page before POSTing.
     else:
         return render_template("friends/add_friend.html")
 
 
 @app.route("/check_friend", methods=["POST"])
+
+# Gives feedback to the user when adding a friend.
 def check_friend():
 
+    # get friendname and user id
     friendname = request.form.get("friendname")
     user_id = session["user_id"]
+
+    # check if friendname is already in friend database
     friends = get_db([""], "", "", [session["user_id"], friendname], "friends")
+
+    # check if friendname is the current user
     username = get_db(["username"], "users", "id", user_id)[0]["username"]
 
+    # friendname is already users friend
     if friends:
         return jsonify(False, True)
+
+    # friendname is the current user
     elif friendname == username:
         return jsonify(True, False)
+
+    # friendname is good
     else:
         return jsonify(True, True)
 
