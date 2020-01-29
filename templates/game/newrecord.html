@@ -13,6 +13,11 @@
 {% endblock %}
 
 {% block main %}
+<div>
+    <audio autoplay hidden loop>
+     <source src="/static/sounds/applause_sound.mp3" type="audio/mpeg">
+    </audio>
+</div>
     {% for firework in range(3) %}
         <div class="firework" id="firework{{ firework }}">
             {% for explsion in range(12) %}
