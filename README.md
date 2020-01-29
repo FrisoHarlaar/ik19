@@ -33,7 +33,7 @@ Door: Sven van Mansom, Richard van den Aardweg en Friso Harlaar<br>
 Vooral gewerkt aan de leaderboards, profile en Mirror mode. Ook aan de opmaak gewerkt met CSS.
 
 ### Friso:
-Voornamelijk bezig geweest met javascript en gebruiksvriendelijkheid van de site. Ook het vrienden systeem toegevoegd.
+Voornamelijk bezig geweest met javascript, autorisatie en gebruiksvriendelijkheid van de site. Ook het vrienden systeem toegevoegd.
 
 
 ## Wegwijzer
