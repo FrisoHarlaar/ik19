@@ -52,7 +52,7 @@ Verder hebben wij een mapje templates, met daarin alle html templates. Hierin zi
 Ook hebben wij een mapje static met daarin alle geluiden, afbeeldingen, css bestanden en externe javascript bestanden waarnaar verwijst wordt in de html bestanden.
 
 Screenshots:
-![Normal mode](screenshots/normalmode.png)
+![Normal mode](screenshots/normalmode.png =250x)
 
 
 
