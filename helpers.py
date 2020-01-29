@@ -55,13 +55,54 @@ def setup():
 
 # Function to easily get data from the database.
 # Items need to be a list of the requested item(s).
-def get_db(items, table, key, value):
+def get_db(items, table, key, value, order=None):
     string = "SELECT "
+
+    if order == "friends":
+        return db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname"
+        , user_id=value[0], friendname=value[1])
 
     for item in items:
         if item != items[0]:
             string += ", "
 
         string += str(item)
-    string += " FROM " + table + " WHERE " + key + "= :key"
-    return db.execute(string, key=str(value))
+
+    string += " FROM " + table
+
+    if key != None and value != None:
+        string += " WHERE " + key + "= :key"
+
+    if order != None:
+        string += " ORDER BY"
+        for item in order:
+           string += " " + item
+           if item != order[-1]:
+               string += ","
+        string += ";"
+
+    if key != None:
+        return db.execute(string, key=str(value))
+    return db.execute(string)
+
+def update_db(command, key1=None, key2=None):
+    if command == "username":
+        return db.execute("UPDATE users SET username = :username WHERE id = :user_id", user_id=key1, username=key2)
+    elif command == "hash":
+        return db.execute("UPDATE users SET hash = :hash WHERE id = :user_id", user_id=key1, hash=key2)
+    elif command == "highscore":
+        return db.execute("UPDATE users SET highscore = :score, date = CURRENT_DATE WHERE id = :user_id",
+                    user_id=key1, score=key2)
+    elif command == "highscore_mirror":
+        return db.execute("UPDATE users SET highscore_mirror = :score, date = CURRENT_DATE WHERE id = :user_id",
+                    user_id=key1, score=key2)
+    pass
+
+def insdel_db(command, key1=None, key2=None):
+    if command == "available":
+        return db.execute("INSERT INTO users (username, hash, highscore, highscore_mirror) VALUES (:username, :password, :hs, :hs)",
+                    username=key1, password=key2, hs=0)
+    elif command == "del_friends":
+        return db.execute("DELETE FROM friends WHERE user_id= :user_id AND friendname= :friendname", user_id=key1, friendname=key2)
+    elif command == "ins_friends":
+        return db.execute("INSERT INTO friends (user_id, friendname) VALUES (:user_id, :friendname)", user_id=key1, friendname=key2)
