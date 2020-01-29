@@ -404,7 +404,9 @@ def triviagame():
     if request.method == "POST":
 
         # Checks if the user answered the question correctly.
-        if request.form.get("answer") != session["correct_answer"]:
+        if request.form.get("answer") == "setup":
+            return setup(True)
+        elif request.form.get("answer") != session["correct_answer"]:
             session["lives"] -= 1
 
             # If the user is out of lives it's game over.
@@ -417,7 +419,7 @@ def triviagame():
     else:
         return redirect("/game_over")
 
-def setup():
+def setup(load=False):
     # Returns the required data for the question.
     if session["score"] <= 10:
         data = new_question("easy")
@@ -434,7 +436,8 @@ def setup():
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
-    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+    return jsonify(lives=session["lives"], question=data["question"],
+    answers=data["all_answers"], score=session["score"], duration=session["duration"], load=load)
 
 
 @app.route("/game_over", methods=["GET", "POST"])

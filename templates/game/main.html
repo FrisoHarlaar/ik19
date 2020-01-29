@@ -37,6 +37,7 @@
 </div>
 <noscript>Your browser needs to support javascript in order for our site to work!</noscript>
 <script>
+
     function new_question(input) {
         $("#transition").addClass('transition_block_away');
         answers = $.post("/triviagame", {answer: input}).done(function(data) {
@@ -44,7 +45,6 @@
             timer(data.duration);
 
             document.getElementById("bar").innerHTML = "";
-
             if (data == false) {
                 window.clearTimeout(time);
                 window.location.href = "/game_over";
