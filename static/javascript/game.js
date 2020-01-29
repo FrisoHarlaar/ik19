@@ -36,7 +36,7 @@ function new_question(input, mode="") {
 
             // end timer and redirect to game over
             window.clearTimeout(time);
-            window.location.href = "/" + mode + "game_over";
+            window.location.href = "/game_over";
         }
         else {
 
