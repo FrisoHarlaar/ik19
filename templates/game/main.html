@@ -39,13 +39,27 @@
 <script>
 
     function new_question(input) {
-        $("#transition").addClass('transition_block_away');
+        if (input == 'setup') {
+            $("#transition").addClass('transition_block');
+        }
+        else {
+            $("#transition").addClass('transition_block_away');
+        }
         answers = $.post("/triviagame", {answer: input}, function(data) {
             window.clearTimeout(time);
             timer(data.duration);
 
             document.getElementById("bar").innerHTML = "";
-            if (data == false) {
+            if (data.load == true) {
+                circle = new ProgressBar.Circle('#bar', {
+                    color: "#fecb4c",
+                    strokeWidth: 6,
+                    duration: data.duration + 2000,
+                    easing: 'easeInOut'
+                });
+                circle.animate(1);
+            }
+            else if (data == false) {
                 window.clearTimeout(time);
                 window.location.href = "/game_over";
             }

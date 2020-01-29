@@ -41,14 +41,28 @@
 <noscript>Your browser needs to support javascript in order for our site to work!</noscript>
 <script>
     function new_question(input) {
-        $("#transition").addClass('transition_block_away');
+        if (input == 'setup') {
+            $("#transition").addClass('transition_block');
+
+        }
+        else {
+            $("#transition").addClass('transition_block_away');
+        }
         answers = $.post("/reverseTriviagame", {answer: input}, function(data) {
             window.clearTimeout(time);
             timer(data.duration);
 
             document.getElementById("bar").innerHTML = "";
-
-            if (data == false) {
+            if (data.load == true) {
+                circle = new ProgressBar.Circle('#bar', {
+                    color: "#fecb4c",
+                    strokeWidth: 6,
+                    duration: data.duration + 2000,
+                    easing: 'easeInOut'
+                });
+                circle.animate(1);
+            }
+            else if (data == false) {
                 window.clearTimeout(time);
                 window.location.href = "/reverse_game_over";
             }
