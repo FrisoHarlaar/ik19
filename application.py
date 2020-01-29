@@ -416,7 +416,7 @@ def triviagame():
 
         # Checks if the user answered the question correctly.
         if request.form.get("answer") == "setup":
-            return setup(True)
+            return jsonify(load=True, duration=session["duration"])
         elif request.form.get("answer") != session["correct_answer"]:
             session["lives"] -= 1
 
@@ -449,7 +449,7 @@ def game_over():
     return render_template("game/game_over.html", mode="/triviagame")
 
 
-@app.route("/reverseTriviagame", methods=["GET", "POST"])
+@app.route("/reversetriviagame", methods=["GET", "POST"])
 @login_required
 def reverseTriviagame():
 
@@ -476,6 +476,8 @@ def reverseTriviagame():
     # After answering the first answer.
     if request.method == "POST":
 
+        if request.form.get("answer") == "setup":
+            return jsonify(load=True, duration=session["duration"])
         # Checks if the user answered the question correctly.
         if request.form['answer'] != session["correct_answer"]:
             session["lives"] -= 1
@@ -491,7 +493,7 @@ def reverseTriviagame():
         return redirect("/reverse_game_over")
 
 
-@app.route("/reverse_game_over", methods=["GET", "POST"])
+@app.route("/reversegame_over", methods=["GET", "POST"])
 @login_required
 def reverse_game_over():
 
