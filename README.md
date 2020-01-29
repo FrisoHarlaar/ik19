@@ -5,6 +5,7 @@ Door: Sven van Mansom, Richard van den Aardweg en Friso Harlaar<br>
 
 ## Features:
  * Spelers kunnen registreren, inloggen en uitloggen met zowel client-side (javascript) als server-side validatie
+ * Wachtwoord moet 6-20 karakters lang zijn, een nummer bevatten en geen spatie bevatten (dit wordt ook gecheckt)
  * Spelers kunnen kiezen uit twee gamemodes: _normal_ en _mirror_
  * De speler beantwoordt multiple choice of true/false trivia vragen
  * In mirror mode staan de vragen in spiegelbeeld (je leest van rechts naar links)
