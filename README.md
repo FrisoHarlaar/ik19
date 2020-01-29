@@ -33,7 +33,7 @@ Door: Sven van Mansom, Richard van den Aardweg en Friso Harlaar<br>
 Vooral gewerkt aan de leaderboards, profile en Mirror mode. Ook ervoor gezorgd dat de gebruikers hun gebruikersnaam en wachtwoord kunnen veranderen.
 
 ### Friso:
-Voornamelijk bezig geweest met javascript en gebruiksvriendelijkheid van de site. Ook het vrienden systeem toegevoegd.
+Voornamelijk bezig geweest met javascript, autorisatie en gebruiksvriendelijkheid van de site. Ook het vrienden systeem toegevoegd.
 
 
 ## Wegwijzer
@@ -54,6 +54,5 @@ Ook hebben wij een mapje static met daarin alle geluiden, afbeeldingen, css best
 Screenshots:
 ![Normal mode](screenshots/normalmode.png)
 
-![Morrir mode](screenshots/mirrormode.png)
 
 
