@@ -53,6 +53,5 @@ Ook hebben wij een mapje static met daarin alle geluiden, afbeeldingen, css best
 Screenshots:
 ![Normal mode](screenshots/normalmode.png)
 
-![Morrir mode](screenshots/mirrormode.png)
 
 
