@@ -38,7 +38,7 @@ def new_question(difficulty):
 def get_db(items, table, key, value, order=None):
     string = "SELECT "
 
-    if order == "friend":
+    if order == "friends":
         return db.execute("SELECT friendname FROM friends WHERE user_id= :user_id AND friendname= :friendname"
         , user_id=value[0], friendname=value[1])
 
