@@ -415,7 +415,9 @@ def triviagame():
     if request.method == "POST":
 
         # Checks if the user answered the question correctly.
-        if request.form.get("answer") != session["correct_answer"]:
+        if request.form.get("answer") == "setup":
+            return setup(True)
+        elif request.form.get("answer") != session["correct_answer"]:
             session["lives"] -= 1
 
             # If the user is out of lives it's game over.

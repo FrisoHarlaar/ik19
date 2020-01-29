@@ -20,7 +20,7 @@
         <script src="{{ url_for('static', filename='javascript/check.js') }}"></script>
     </head>
 
-    <body>
+    <body onload="new_question('setup')">
         <nav class="navbar fixed-top navbar-expand-md">
             {% block error %}{% endblock %}
             <div class="collapse navbar-collapse" id="navbar">

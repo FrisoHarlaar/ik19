@@ -33,7 +33,7 @@ def new_question(difficulty):
         random.shuffle(data["all_answers"])
         return data
 
-def setup():
+def setup(load=False):
     # Returns the required data for the question.
     if session["score"] <= 10:
         data = new_question("easy")
@@ -50,7 +50,7 @@ def setup():
         session["duration"] -= 5000
         if session["lives"] < 4:
             session["lives"] += 1
-    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"])
+    return jsonify(lives=session["lives"], question=data["question"], answers=data["all_answers"], score=session["score"], duration=session["duration"], load=load)
 
 
 # Function to easily get data from the database.
