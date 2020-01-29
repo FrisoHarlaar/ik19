@@ -30,7 +30,7 @@ Door: Sven van Mansom, Richard van den Aardweg en Friso Harlaar<br>
 ### Sven:
 
 ### Richard:
-Vooral gewerkt aan de leaderboards, profile en Mirror mode. Ook aan de opmaak gewerkt met CSS.
+Vooral gewerkt aan de leaderboards, profile en Mirror mode. Ook ervoor gezorgd dat de gebruikers hun gebruikersnaam en wachtwoord kunnen veranderen.
 
 ### Friso:
 Voornamelijk bezig geweest met javascript en gebruiksvriendelijkheid van de site. Ook het vrienden systeem toegevoegd.
