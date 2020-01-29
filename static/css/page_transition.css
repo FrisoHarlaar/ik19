@@ -1,3 +1,8 @@
+/*
+    * File: page_transition.css
+    * Use: provides a transition animation for the questions in the triviagame
+*/
+
 .transition_block{
     animation: transition 1.5s;
 }

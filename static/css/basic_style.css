@@ -1,4 +1,10 @@
-@font-face {
+/*
+    * File: basic_style.css
+    * Use: provides universal styling for the site
+*/
+
+@font-face
+{
     font-family: 'Baloo Regular'; /*a name to be used later*/
     src: url('../Baloo-Regular.woff') format('woff');
 }

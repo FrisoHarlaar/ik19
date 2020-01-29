@@ -1,3 +1,9 @@
+/*
+    * File: profile.css
+    * Use: provides alerts for all the check functions
+    * Made with the help of this page: https://www.w3schools.com/howto/howto_js_snackbar.asp
+*/
+
 .snackbar {
   visibility: hidden;
   width: 250px;

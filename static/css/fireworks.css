@@ -1,12 +1,8 @@
-body
-{
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+/*
+    * File: fireworks.css
+    * Use: provides fireworks on the newrecord screen
+    * Made following this tutorial video: https://www.youtube.com/watch?v=K4K7HNavK4U
+*/
 
 .firework
 {
@@ -43,6 +39,7 @@ body
     overflow: hidden;
 }
 
+/* Does the position for every explosion "line" */
 .explosion:nth-child(1)
 {
     transform: rotate(0deg) translateY(-15px);

@@ -1,10 +1,15 @@
+/*
+    * File: game_style.css
+    * Use: provides styling and animations for the triviagame
+    * The timer was with help from this page: https://github.com/kimmobrunfeldt/progressbar.js/issues/64
+*/
+
 .hearth
 {
     margin-top: 5%;
     animation-name: beatingHeart;
     animation-timing-function: ease-in-out;
     animation: beatingHeart 1.5s infinite;
-
 }
 
 @keyframes beatingHeart {

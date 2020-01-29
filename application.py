@@ -1,3 +1,9 @@
+"""
+* File: application.py
+* By: Sven van Mansom, Friso Harlaar and Richard van den Aardweg
+* Use: Main file behind the brainbrawlers website
+"""
+
 import os, urllib.request
 from cs50 import SQL
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
