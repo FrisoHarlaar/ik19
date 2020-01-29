@@ -64,7 +64,16 @@
                 window.location.href = "/game_over";
             }
             else {
+                document.getElementById("score").innerHTML = data.score;
+                document.getElementById("question").innerHTML = data.question;
+                document.getElementById("answers").innerHTML = "";
                 let i;
+                for (i = 0; i < data.answers.length; i++) {
+                    document.getElementById("answers").innerHTML += "<button type='submit' name='answer' value='" + data.answers[i] + "' class='btn answer'>" + data.answers[i] + "</button>";
+                }
+                $("#transition").removeClass('transition_block_away');
+                $("#transition").addClass('transition_block');
+
                 for (i = 0; i < (4 - data.lives); i++) {
                     $("#heart" + i).addClass('fadein');
                     $("#heart" + i).attr("src", "static/images/broken_hearth.png");
@@ -79,15 +88,6 @@
                         $("#heart" + id).attr("alt", "hearth");
                     }
                 }
-
-                document.getElementById("score").innerHTML = data.score;
-                document.getElementById("question").innerHTML = data.question;
-                document.getElementById("answers").innerHTML = "";
-                for (i = 0; i < data.answers.length; i++) {
-                    document.getElementById("answers").innerHTML += "<button type='submit' name='answer' value='" + data.answers[i] + "' class='btn answer'>" + data.answers[i] + "</button>";
-                }
-                $("#transition").removeClass('transition_block_away');
-                $("#transition").addClass('transition_block');
 
                 circle = new ProgressBar.Circle('#bar', {
                     color: "#fecb4c",
