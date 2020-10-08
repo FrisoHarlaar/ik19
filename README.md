@@ -55,5 +55,7 @@ Ook hebben wij een mapje static met daarin alle geluiden, afbeeldingen, css best
 Screenshot: <br>
 <img src="screenshots/normalmode.png" alt="Normal mode" width="650"/>
 
+Videolink: <br>
+https://youtu.be/Md2bwXf-hB8
 
 
