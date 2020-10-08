@@ -9,7 +9,7 @@ from functools import wraps
 from cs50 import SQL
 
 # Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///brainbrawlers.db")
+db = SQL("postgres://uomwmqgrrsluox:e24e93a85d1bc3a77160440730810b49ee256e8552117a8623e12f67e818357c@ec2-54-228-170-125.eu-west-1.compute.amazonaws.com:5432/dfr7jp5obkns6k")
 
 def login_required(f):
 
